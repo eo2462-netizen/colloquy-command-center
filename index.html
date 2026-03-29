@@ -6,1459 +6,1279 @@
 <title>Evan's Colloquy Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #0d1b2a;
-    --cream: #f0f4f8;
-    --warm: #dce8f0;
-    --gold: #2a7abf;
-    --gold-light: #5ba3d9;
-    --rust: #cc5500;
-    --slate: #1a4f7a;
-    --muted: #5a7a8a;
-    --green: #1a6a9a;
-    --green-light: #d0e8f5;
-    --done-bg: #e8f2f8;
-    --cerulean: #2a7abf;
-    --cerulean-light: #5ba3d9;
-    --cerulean-pale: #d0e8f5;
-    --burnt-orange: #cc5500;
-    --burnt-orange-light: #e07a30;
-    --burnt-orange-pale: #fde8d8;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--cream);
-    color: var(--ink);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  .header {
-    background: var(--ink);
-    color: var(--cream);
-    padding: 48px 60px 40px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 320px; height: 320px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(42,122,191,0.2) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-
-  .header-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 5vw, 52px);
-    font-weight: 900;
-    line-height: 1.1;
-    letter-spacing: -1px;
-  }
-
-  .header-title span {
-    color: var(--gold);
-  }
-
-  .header-meta {
-    text-align: right;
-  }
-
-  .deadline-box {
-    background: var(--rust);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    text-align: center;
-  }
-
-  .deadline-box .label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.8;
-    margin-bottom: 4px;
-  }
-
-  .deadline-box .date {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 700;
-  }
-
-  .countdown {
-    margin-top: 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--gold-light);
-    text-align: center;
-  }
-
-  .header-subtitle {
-    font-size: 15px;
-    color: rgba(245,240,232,0.65);
-    margin-top: 16px;
-    max-width: 520px;
-    line-height: 1.6;
-    font-weight: 300;
-  }
-
-  /* NAV TABS */
-  .nav {
-    background: var(--ink);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    padding: 0 60px;
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-  }
-
-  .nav-tab {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(245,240,232,0.45);
-    padding: 16px 24px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: all 0.2s;
-    user-select: none;
-  }
-
-  .nav-tab:hover { color: rgba(245,240,232,0.8); }
-
-  .nav-tab.active {
-    color: var(--gold);
-    border-bottom-color: var(--gold);
-  }
-
-  /* MAIN */
-  .main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 48px 40px 80px;
-  }
-
-  /* SECTION */
-  .section { display: none; }
-  .section.active { display: block; }
-
-  /* PROGRESS BAR */
-  .progress-bar-wrap {
-    background: var(--warm);
-    border-radius: 100px;
-    height: 6px;
-    margin-bottom: 40px;
-    overflow: hidden;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--cerulean), var(--burnt-orange));
-    border-radius: 100px;
-    transition: width 0.5s ease;
-  }
-
-  .progress-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
-
-  /* WEEK HEADER */
-  .week-header {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 28px;
-    margin-top: 48px;
-  }
-
-  .week-header:first-child { margin-top: 0; }
-
-  .week-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-  }
-
-  .week-theme {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
-  .week-divider {
-    flex: 1;
-    height: 1px;
-    background: var(--warm);
-  }
-
-  /* DAY CARD */
-  .day-card {
-    background: white;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    transition: box-shadow 0.2s;
-  }
-
-  .day-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-
-  .day-card.completed {
-    background: var(--done-bg);
-    opacity: 0.75;
-  }
-
-  .day-header {
-    display: flex;
-    align-items: center;
-    padding: 20px 24px;
-    cursor: pointer;
-    gap: 16px;
-    user-select: none;
-  }
-
-  .day-number {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    min-width: 60px;
-    text-transform: uppercase;
-  }
-
-  .day-title {
-    font-size: 16px;
-    font-weight: 600;
-    flex: 1;
-  }
-
-  .day-date {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    margin-right: 12px;
-  }
-
-  .day-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 100px;
-    margin-right: 8px;
-  }
-
-  .tag-read { background: #d0e8f5; color: #1a5a8a; }
-  .tag-listen { background: #fde8d8; color: #993d00; }
-  .tag-write { background: #d0e8f5; color: #1a5a8a; }
-  .tag-both { background: #fde8d8; color: #993d00; }
-  .tag-review { background: var(--warm); color: var(--muted); }
-
-  .day-toggle {
-    font-size: 20px;
-    color: var(--muted);
-    transition: transform 0.25s;
-    line-height: 1;
-  }
-
-  .day-card.open .day-toggle { transform: rotate(180deg); }
-
-  .complete-btn {
-    background: none;
-    border: 1.5px solid var(--warm);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: var(--muted);
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-
-  .complete-btn:hover {
-    border-color: var(--cerulean);
-    color: var(--cerulean);
-    background: var(--cerulean-pale);
-  }
-
-  .day-card.completed .complete-btn {
-    background: var(--cerulean);
-    border-color: var(--cerulean);
-    color: white;
-  }
-
-  /* DAY BODY */
-  .day-body {
-    padding: 0 24px 24px;
-    display: none;
-    border-top: 1px solid var(--warm);
-  }
-
-  .day-card.open .day-body { display: block; }
-
-  .day-focus {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin: 20px 0 12px;
-  }
-
-  .task-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .task-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #2a2a2a;
-  }
-
-  .task-check {
-    width: 18px;
-    height: 18px;
-    border: 1.5px solid #ccc;
-    border-radius: 4px;
-    flex-shrink: 0;
-    margin-top: 3px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    transition: all 0.15s;
-  }
-
-  .task-check:hover { border-color: var(--gold); }
-  .task-check.checked { background: var(--gold); border-color: var(--gold); color: white; }
-
-  .task-text.checked-text { text-decoration: line-through; color: var(--muted); }
-
-  .task-link {
-    color: var(--rust);
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .task-link:hover { text-decoration: underline; }
-
-  .day-note {
-    margin-top: 16px;
-    padding: 14px 16px;
-    background: #fffdf5;
-    border-left: 3px solid var(--gold);
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.7;
-    border-radius: 0 6px 6px 0;
-  }
-
-  .day-note strong { color: var(--ink); }
-
-  /* READING LIST */
-  .reading-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
-    margin-top: 8px;
-  }
-
-  .reading-card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    border-top: 3px solid var(--gold);
-    transition: box-shadow 0.2s, transform 0.2s;
-    position: relative;
-  }
-
-  .reading-card:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-  }
-
-  .reading-card.priority-high { border-top-color: var(--rust); }
-  .reading-card.priority-medium { border-top-color: var(--gold); }
-  .reading-card.priority-low { border-top-color: var(--muted); }
-
-  .reading-type {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .reading-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.3;
-    margin-bottom: 6px;
-    color: var(--ink);
-  }
-
-  .reading-source {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .reading-why {
-    font-size: 13px;
-    line-height: 1.65;
-    color: #3a3a3a;
-    margin-bottom: 16px;
-  }
-
-  .reading-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 14px;
-  }
-
-  .rtag {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 100px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .rtag-abs { background: #fef0e7; color: #a0460a; }
-  .rtag-valuation { background: #e8f4fd; color: #1a6b9a; }
-  .rtag-streaming { background: #edf7ee; color: #256133; }
-  .rtag-deals { background: #f3eafa; color: #5e2d8c; }
-  .rtag-data { background: #fff3e0; color: #795548; }
-  .rtag-foundational { background: var(--warm); color: var(--muted); }
-
-  .reading-week {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .priority-badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 100px;
-  }
-
-  .badge-high { background: #fde8e3; color: var(--rust); }
-  .badge-medium { background: #fef5df; color: #8a6a00; }
-  .badge-low { background: var(--warm); color: var(--muted); }
-
-  .reading-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--rust);
-    text-decoration: none;
-    margin-top: 4px;
-  }
-
-  .reading-link:hover { text-decoration: underline; }
-
-  /* FILTER BAR */
-  .filter-bar {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 32px;
-  }
-
-  .filter-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 8px 16px;
-    border-radius: 100px;
-    border: 1.5px solid var(--warm);
-    background: white;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--muted);
-  }
-
-  .filter-btn:hover { border-color: var(--gold); color: var(--ink); }
-  .filter-btn.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
-
-  /* CONCEPT CARDS */
-  .concept-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-  }
-
-  .concept-card {
-    background: white;
-    border-radius: 12px;
-    padding: 28px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-
-  .concept-number {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--gold);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-  }
-
-  .concept-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    line-height: 1.25;
-  }
-
-  .concept-explain {
-    font-size: 13px;
-    line-height: 1.75;
-    color: #3a3a3a;
-    margin-bottom: 16px;
-  }
-
-  .concept-example {
-    background: #fffdf5;
-    border-left: 3px solid var(--gold);
-    padding: 12px 14px;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-    border-radius: 0 6px 6px 0;
-  }
-
-  .concept-example strong { color: var(--ink); font-size: 12px; display: block; margin-bottom: 4px; font-family: 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
-
-  /* SECTION TITLE */
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 34px;
-    font-weight: 900;
-    margin-bottom: 8px;
-    line-height: 1.1;
-  }
-
-  .section-subtitle {
-    font-size: 15px;
-    color: var(--muted);
-    margin-bottom: 40px;
-    max-width: 560px;
-    line-height: 1.6;
-    font-weight: 300;
-  }
-
-  /* STATS ROW */
-  .stats-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 48px;
-  }
-
-  .stat-card {
-    background: white;
-    border-radius: 10px;
-    padding: 20px 28px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    min-width: 140px;
-  }
-
-  .stat-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--ink);
-    line-height: 1;
-  }
-
-  .stat-value span { font-size: 18px; color: var(--gold); }
-
-  .stat-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 6px;
-  }
-
-  /* CHEAT SHEET */
-  .formula-block {
-    background: var(--ink);
-    color: var(--cream);
-    border-radius: 12px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .formula-label {
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-
-  .formula {
-    font-size: 18px;
-    line-height: 1.6;
-    color: var(--cream);
-  }
-
-  .formula .var { color: var(--gold-light); }
-  .formula .eq { color: var(--rust); margin: 0 6px; }
-
-  .formula-note {
-    font-size: 12px;
-    color: rgba(245,240,232,0.55);
-    margin-top: 10px;
-    line-height: 1.6;
-  }
-
-  /* VOCAB */
-  .vocab-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .vocab-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .vocab-term {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--ink);
-    padding: 14px 20px;
-    min-width: 220px;
-    border-right: 1px solid var(--warm);
-    background: #fafafa;
-    line-height: 1.5;
-  }
-
-  .vocab-def {
-    font-size: 13px;
-    color: #3a3a3a;
-    padding: 14px 20px;
-    line-height: 1.6;
-    flex: 1;
-  }
-
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--warm); }
-  ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
-
-  /* RESPONSIVE */
-  @media (max-width: 700px) {
-    .header { padding: 32px 24px 28px; }
-    .nav { padding: 0 24px; }
-    .main { padding: 32px 20px 60px; }
-    .header-top { flex-direction: column; }
-    .header-meta { text-align: left; }
-  }
+:root {
+  --ink: #0d1b2a;
+  --cream: #f0f4f8;
+  --warm: #dce8f0;
+  --cerulean: #2a7abf;
+  --cerulean-light: #5ba3d9;
+  --cerulean-pale: #d0e8f5;
+  --burnt: #cc5500;
+  --burnt-light: #e07a30;
+  --burnt-pale: #fde8d8;
+  --muted: #5a7a8a;
+  --slate: #1a4f7a;
+  --white: #ffffff;
+  --done-bg: #e8f2f8;
+  --green: #1a7a4a;
+  --green-pale: #d0f0e0;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--cream); color:var(--ink); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+/* ── HEADER ── */
+.header {
+  background:var(--ink);
+  color:var(--cream);
+  padding:40px 56px 36px;
+  position:relative;
+  overflow:hidden;
+}
+.header::before {
+  content:'';
+  position:absolute;
+  top:-60px; right:-60px;
+  width:280px; height:280px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(42,122,191,.22) 0%,transparent 70%);
+  pointer-events:none;
+}
+.header::after {
+  content:'';
+  position:absolute;
+  bottom:-80px; left:30%;
+  width:200px; height:200px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(204,85,0,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.header-row { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px; }
+.header-eyebrow { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--cerulean-light); text-transform:uppercase; margin-bottom:10px; }
+.header-title { font-family:'Playfair Display',serif; font-size:clamp(28px,4.5vw,48px); font-weight:900; line-height:1.1; letter-spacing:-1px; }
+.header-title span { color:var(--burnt-light); }
+.header-sub { font-size:13px; color:rgba(240,244,248,.6); margin-top:12px; max-width:480px; line-height:1.7; font-weight:300; font-style:italic; }
+.deadline-card { background:var(--burnt); color:white; padding:14px 22px; border-radius:8px; text-align:center; min-width:160px; }
+.deadline-card .dl-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; opacity:.8; margin-bottom:4px; }
+.deadline-card .dl-date { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; }
+.deadline-card .dl-count { font-family:'DM Mono',monospace; font-size:10px; margin-top:4px; opacity:.75; }
+
+/* ── NAV ── */
+.nav { background:var(--ink); border-top:1px solid rgba(255,255,255,.07); padding:0 56px; display:flex; overflow-x:auto; gap:0; }
+.nav-tab { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(240,244,248,.4); padding:14px 20px; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all .2s; user-select:none; }
+.nav-tab:hover { color:rgba(240,244,248,.75); }
+.nav-tab.active { color:var(--cerulean-light); border-bottom-color:var(--cerulean-light); }
+
+/* ── MAIN ── */
+.main { max-width:1160px; margin:0 auto; padding:44px 40px 80px; }
+.section { display:none; }
+.section.active { display:block; }
+
+/* ── SECTION HEADER ── */
+.sec-title { font-family:'Playfair Display',serif; font-size:32px; font-weight:900; margin-bottom:6px; }
+.sec-sub { font-size:14px; color:var(--muted); margin-bottom:36px; max-width:560px; line-height:1.6; font-weight:300; }
+
+/* ── STATS ROW ── */
+.stats-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:40px; }
+.stat-card { background:white; border-radius:10px; padding:18px 24px; box-shadow:0 1px 4px rgba(0,0,0,.06); min-width:120px; }
+.stat-val { font-family:'Playfair Display',serif; font-size:34px; font-weight:900; line-height:1; }
+.stat-val sup { font-size:16px; color:var(--burnt); }
+.stat-lbl { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:5px; }
+
+/* ── PROGRESS ── */
+.prog-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; margin-bottom:6px; }
+.prog-wrap { background:var(--warm); border-radius:100px; height:5px; margin-bottom:36px; overflow:hidden; }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--cerulean),var(--burnt)); border-radius:100px; transition:width .5s; }
+
+/* ── WEEK HEADER ── */
+.week-head { display:flex; align-items:baseline; gap:14px; margin-bottom:22px; margin-top:44px; }
+.week-head:first-of-type { margin-top:0; }
+.week-name { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; }
+.week-theme { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--burnt); }
+.week-div { flex:1; height:1px; background:var(--warm); }
+
+/* ── DAY CARD ── */
+.day-card { background:white; border-radius:10px; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); transition:box-shadow .2s; }
+.day-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.09); }
+.day-card.completed { background:var(--done-bg); opacity:.72; }
+.day-header { display:flex; align-items:center; padding:18px 22px; cursor:pointer; gap:14px; user-select:none; }
+.day-num { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--muted); min-width:54px; text-transform:uppercase; }
+.day-title-text { font-size:15px; font-weight:600; flex:1; }
+.day-date-text { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-right:10px; }
+.day-tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; padding:3px 9px; border-radius:100px; margin-right:6px; }
+.tag-read { background:var(--cerulean-pale); color:var(--slate); }
+.tag-listen { background:var(--burnt-pale); color:#7a3000; }
+.tag-write { background:#d0f0e0; color:#1a5a30; }
+.tag-both { background:#f0e0f8; color:#5a1a8a; }
+.tag-review { background:var(--warm); color:var(--muted); }
+.complete-btn { background:none; border:1.5px solid var(--warm); border-radius:50%; width:26px; height:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--muted); transition:all .2s; flex-shrink:0; }
+.complete-btn:hover { border-color:var(--cerulean); color:var(--cerulean); background:var(--cerulean-pale); }
+.day-card.completed .complete-btn { background:var(--cerulean); border-color:var(--cerulean); color:white; }
+.day-toggle { font-size:18px; color:var(--muted); transition:transform .25s; line-height:1; }
+.day-card.open .day-toggle { transform:rotate(180deg); }
+.day-body { padding:0 22px 22px; display:none; border-top:1px solid var(--warm); }
+.day-card.open .day-body { display:block; }
+.day-focus { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--cerulean); margin:18px 0 12px; }
+.task-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+.task-item { display:flex; align-items:flex-start; gap:10px; font-size:13px; line-height:1.65; color:#2a2a2a; }
+.task-check { width:16px; height:16px; border:1.5px solid #ccc; border-radius:3px; flex-shrink:0; margin-top:3px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; transition:all .15s; }
+.task-check:hover { border-color:var(--cerulean); }
+.task-check.checked { background:var(--cerulean); border-color:var(--cerulean); color:white; }
+.task-text.done { text-decoration:line-through; color:var(--muted); }
+.task-link { color:var(--burnt); text-decoration:none; font-weight:500; }
+.task-link:hover { text-decoration:underline; }
+.day-note { margin-top:14px; padding:12px 14px; background:#fffdf5; border-left:3px solid var(--burnt); font-size:12px; color:var(--muted); line-height:1.7; border-radius:0 6px 6px 0; }
+.day-note strong { color:var(--ink); }
+
+/* ── SOURCE LIBRARY ── */
+.source-filter { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+.sfbtn { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; padding:7px 14px; border-radius:100px; border:1.5px solid var(--warm); background:white; cursor:pointer; transition:all .15s; color:var(--muted); }
+.sfbtn:hover { border-color:var(--cerulean); color:var(--ink); }
+.sfbtn.active { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+.source-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:18px; }
+.src-card { background:white; border-radius:10px; padding:22px; box-shadow:0 1px 4px rgba(0,0,0,.05); border-top:3px solid var(--cerulean); position:relative; transition:box-shadow .2s,transform .2s; }
+.src-card:hover { box-shadow:0 6px 18px rgba(0,0,0,.09); transform:translateY(-2px); }
+.src-card.priority-core { border-top-color:var(--burnt); }
+.src-card.priority-support { border-top-color:var(--cerulean); }
+.src-card.priority-listen { border-top-color:var(--muted); }
+.src-badge { position:absolute; top:14px; right:14px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; padding:3px 8px; border-radius:100px; }
+.badge-core { background:var(--burnt-pale); color:var(--burnt); }
+.badge-support { background:var(--cerulean-pale); color:var(--slate); }
+.badge-listen { background:var(--warm); color:var(--muted); }
+.src-type { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+.src-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; line-height:1.3; margin-bottom:5px; }
+.src-author { font-size:12px; color:var(--muted); margin-bottom:12px; }
+.src-why { font-size:12px; line-height:1.7; color:#3a3a3a; margin-bottom:14px; }
+.src-data { background:#fffaf5; border-left:3px solid var(--burnt); padding:10px 12px; font-size:11px; color:var(--muted); line-height:1.6; border-radius:0 5px 5px 0; margin-bottom:12px; }
+.src-data strong { color:var(--ink); font-family:'DM Mono',monospace; font-size:10px; display:block; margin-bottom:3px; letter-spacing:.5px; text-transform:uppercase; }
+.src-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+.stag { font-family:'DM Mono',monospace; font-size:9px; padding:2px 7px; border-radius:100px; text-transform:uppercase; letter-spacing:1px; }
+.stag-abs { background:var(--burnt-pale); color:#7a3000; }
+.stag-val { background:var(--cerulean-pale); color:var(--slate); }
+.stag-stream { background:#d0f0e0; color:#1a5a30; }
+.stag-deals { background:#f0e0f8; color:#5a1a8a; }
+.stag-found { background:var(--warm); color:var(--muted); }
+.src-link { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:var(--burnt); text-decoration:none; }
+.src-link:hover { text-decoration:underline; }
+.annotation-area { margin-top:12px; }
+.annotation-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+.annotation-box { width:100%; min-height:70px; padding:9px 11px; font-size:12px; font-family:'DM Sans',sans-serif; border:1.5px solid var(--warm); border-radius:6px; resize:vertical; color:var(--ink); background:#fafafa; transition:border .2s; line-height:1.6; }
+.annotation-box:focus { outline:none; border-color:var(--cerulean); background:white; }
+
+/* ── KEY DATA ── */
+.data-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:18px; margin-bottom:32px; }
+.data-card { background:white; border-radius:10px; padding:22px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+.data-card-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--burnt); margin-bottom:12px; }
+.data-stat { display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+.data-num { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; color:var(--ink); }
+.data-desc { font-size:12px; color:var(--muted); line-height:1.5; }
+.data-context { font-size:12px; line-height:1.7; color:#3a3a3a; margin-top:10px; padding-top:10px; border-top:1px solid var(--warm); }
+.formula-block { background:var(--ink); color:var(--cream); border-radius:10px; padding:24px 28px; margin-bottom:18px; }
+.formula-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--cerulean-light); margin-bottom:10px; }
+.formula-body { font-family:'DM Mono',monospace; font-size:15px; line-height:1.8; }
+.formula-body .fvar { color:var(--burnt-light); }
+.formula-body .feq { color:var(--cerulean-light); margin:0 6px; }
+.formula-note { font-size:12px; color:rgba(240,244,248,.55); margin-top:10px; line-height:1.65; }
+
+/* ── CASE STUDIES ── */
+.case-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px; }
+.case-card { background:white; border-radius:10px; padding:24px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+.case-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.case-artist { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; }
+.case-song { font-size:12px; color:var(--muted); margin-top:2px; font-style:italic; }
+.case-type { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; padding:4px 10px; border-radius:100px; }
+.type-sync { background:var(--cerulean-pale); color:var(--slate); }
+.type-viral { background:var(--burnt-pale); color:#7a3000; }
+.type-campaign { background:#d0f0e0; color:#1a5a30; }
+.type-reputational { background:#f0e0f8; color:#5a1a8a; }
+.case-timeline { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.timeline-row { display:flex; gap:10px; align-items:flex-start; }
+.tl-dot { width:8px; height:8px; border-radius:50%; background:var(--warm); flex-shrink:0; margin-top:5px; }
+.tl-dot.filled { background:var(--cerulean); }
+.tl-dot.highlight { background:var(--burnt); }
+.tl-content { font-size:12px; line-height:1.6; color:#3a3a3a; }
+.tl-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:1px; }
+.verdict-area { margin-top:14px; padding:12px 14px; border-radius:6px; }
+.verdict-area.step { background:var(--green-pale); border-left:3px solid var(--green); }
+.verdict-area.spike { background:var(--burnt-pale); border-left:3px solid var(--burnt); }
+.verdict-area.tbd { background:var(--warm); border-left:3px solid var(--muted); }
+.verdict-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+.verdict-text { font-size:12px; line-height:1.6; font-weight:500; }
+.notes-input { width:100%; min-height:60px; padding:9px 11px; font-size:12px; font-family:'DM Sans',sans-serif; border:1.5px solid var(--warm); border-radius:6px; resize:vertical; color:var(--ink); background:#fafafa; margin-top:12px; line-height:1.6; transition:border .2s; }
+.notes-input:focus { outline:none; border-color:var(--cerulean); background:white; }
+
+/* ── PROPOSAL WORKSPACE ── */
+.proposal-intro { background:white; border-radius:10px; padding:24px; margin-bottom:24px; box-shadow:0 1px 4px rgba(0,0,0,.05); border-left:4px solid var(--burnt); }
+.proposal-intro p { font-size:13px; line-height:1.75; color:#2a2a2a; }
+.proposal-intro strong { color:var(--ink); }
+.prop-sections { display:flex; flex-direction:column; gap:20px; }
+.prop-section { background:white; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+.prop-sec-header { padding:18px 22px; background:var(--ink); color:var(--cream); display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; }
+.prop-sec-num { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--cerulean-light); }
+.prop-sec-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; }
+.prop-sec-req { font-size:11px; color:rgba(240,244,248,.55); margin-top:2px; }
+.prop-sec-toggle { font-size:18px; color:rgba(240,244,248,.5); transition:transform .25s; }
+.prop-section.open .prop-sec-toggle { transform:rotate(180deg); }
+.prop-sec-body { padding:24px; display:none; }
+.prop-section.open .prop-sec-body { display:block; }
+.draft-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--burnt); margin-bottom:8px; }
+.draft-text { background:var(--burnt-pale); border-left:3px solid var(--burnt); padding:14px 16px; font-size:13px; line-height:1.8; color:#2a1a0a; border-radius:0 6px 6px 0; margin-bottom:16px; }
+.draft-note { font-size:11px; color:var(--muted); font-style:italic; margin-bottom:14px; }
+.writing-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--cerulean); margin-bottom:8px; }
+.writing-area { width:100%; min-height:140px; padding:12px 14px; font-size:13px; font-family:'DM Sans',sans-serif; border:1.5px solid var(--warm); border-radius:6px; resize:vertical; color:var(--ink); background:#fafafa; line-height:1.75; transition:border .2s; }
+.writing-area:focus { outline:none; border-color:var(--cerulean); background:white; }
+.checklist { list-style:none; display:flex; flex-direction:column; gap:7px; margin-top:14px; }
+.checklist li { display:flex; gap:10px; font-size:12px; line-height:1.6; color:#2a2a2a; align-items:flex-start; }
+.checklist li::before { content:'□'; color:var(--cerulean); font-size:14px; flex-shrink:0; line-height:1.3; }
+.prop-rq { background:var(--cerulean-pale); border-left:3px solid var(--cerulean); padding:12px 14px; font-size:13px; line-height:1.7; color:var(--slate); border-radius:0 6px 6px 0; margin-bottom:10px; font-style:italic; }
+
+/* ── VOCAB ── */
+.vocab-list { display:flex; flex-direction:column; gap:2px; }
+.vocab-item { display:flex; background:white; border-radius:7px; overflow:hidden; }
+.vocab-term { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; padding:13px 18px; min-width:210px; border-right:1px solid var(--warm); background:#fafafa; line-height:1.5; color:var(--ink); flex-shrink:0; }
+.vocab-def { font-size:12px; color:#3a3a3a; padding:13px 18px; line-height:1.65; flex:1; }
+
+/* ── MISC ── */
+.divider { height:1px; background:var(--warm); margin:32px 0; }
+.pill { display:inline-flex; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; padding:3px 9px; border-radius:100px; }
+
+@media(max-width:680px){
+  .header,.nav { padding-left:20px; padding-right:20px; }
+  .main { padding:28px 16px 60px; }
+  .header-row { flex-direction:column; }
+  .source-grid,.case-grid,.data-grid { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <div class="header-top">
+  <div class="header-row">
     <div>
-      <div class="header-label">NYU Steinhardt · Music Business M.A. · Spring 2026</div>
+      <div class="header-eyebrow">NYU Steinhardt · Music Business M.A. · Spring 2026</div>
       <h1 class="header-title">Colloquy<br><span>Command Center</span></h1>
-      <p class="header-subtitle">How Exploitation Events Shape Music Catalog Value: Revenue Durability in the Streaming Era (2020–2025)</p>
+      <p class="header-sub">How Exploitation Events Shape Music Catalog Value: Revenue Durability in the Streaming Era (2020–2025)</p>
     </div>
-    <div class="header-meta">
-      <div class="deadline-box">
-        <div class="label">Proposal Due</div>
-        <div class="date">April 13, 2026</div>
+    <div>
+      <div class="deadline-card">
+        <div class="dl-label">Proposal Due</div>
+        <div class="dl-date">April 13, 2026</div>
+        <div class="dl-count" id="countdown">Loading...</div>
       </div>
-      <div class="countdown" id="countdown">Loading...</div>
     </div>
   </div>
 </div>
 
+<!-- NAV -->
 <nav class="nav">
-  <div class="nav-tab active" onclick="showSection('schedule')">Daily Schedule</div>
-  <div class="nav-tab" onclick="showSection('reading')">Reading List</div>
-  <div class="nav-tab" onclick="showSection('concepts')">Finance Concepts</div>
-  <div class="nav-tab" onclick="showSection('vocab')">Vocab & Cheat Sheet</div>
+  <div class="nav-tab active" onclick="showSection('schedule',this)">Daily Schedule</div>
+  <div class="nav-tab" onclick="showSection('sources',this)">Source Library</div>
+  <div class="nav-tab" onclick="showSection('cases',this)">Case Studies</div>
+  <div class="nav-tab" onclick="showSection('proposal',this)">Proposal Workspace</div>
+  <div class="nav-tab" onclick="showSection('data',this)">Key Data & Formulas</div>
+  <div class="nav-tab" onclick="showSection('vocab',this)">Vocab</div>
 </nav>
 
 <div class="main">
 
-  <!-- ===== SCHEDULE ===== -->
-  <div class="section active" id="schedule">
-    <h2 class="section-title">Your 14-Day Plan</h2>
-    <p class="section-subtitle">Two weeks to go from curious to dangerous. Week 1 is pure absorption — finance, data, deals. Week 2 is synthesis and writing. Don't skip the cheat sheet exercises.</p>
+<!-- ══════════════════════════════════════════════════
+     SCHEDULE
+══════════════════════════════════════════════════ -->
+<div class="section active" id="schedule">
+  <h2 class="sec-title">14-Day Plan</h2>
+  <p class="sec-sub">Week 1 is finance fundamentals. Week 2 is synthesis and writing. Don't skip the exercises.</p>
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-value" id="days-left">14</div>
-        <div class="stat-label">Days Left</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="tasks-done">0<span>/52</span></div>
-        <div class="stat-label">Tasks Done</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">3</div>
-        <div class="stat-label">Case Studies</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">8<span>+</span></div>
-        <div class="stat-label">Sources Needed</div>
-      </div>
-    </div>
-
-    <div class="progress-label">Overall Progress</div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
-    </div>
-
-    <!-- WEEK 1 -->
-    <div class="week-header">
-      <div class="week-label">Week 1</div>
-      <div class="week-theme">Build the Financial Foundation</div>
-      <div class="week-divider"></div>
-    </div>
-
-    <!-- DAY 1 -->
-    <div class="day-card" id="day-1">
-      <div class="day-header" onclick="toggleDay('day-1')">
-        <button class="complete-btn" onclick="completeDay(event,'day-1')">✓</button>
-        <div class="day-number">Day 01</div>
-        <div class="day-title">TTM Multiples — Own the Foundation</div>
-        <div class="day-date">Sun Mar 29</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: How multiples work and why they dominate</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Re-read Shot Tower Capital 2025 report (pages 12–18). Every time you see a multiple, ask: what revenue assumption is baked in, and what breaks it?</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://alderbrook.substack.com/p/navigating-music-catalog-valuations" target="_blank">Alderbrook Substack — Navigating Catalog Valuations Part II</a>. Best plain-English DCF vs. multiples explainer available.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.citrincooperman.com/infocus/a-primer-for-valuation-of-music-catalogs" target="_blank">Citrin Cooperman — A Primer for Valuation of Music Catalogs</a>. Covers all three valuation approaches with real examples.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Write a one-page cheat sheet in your own words: what TTM multiples are, why they dominate, what DCF does differently. Don't move on until you can explain it out loud without notes.</span></li>
-        </ul>
-        <div class="day-note"><strong>Why this first:</strong> Everything else — ABS, deal structure, your thesis argument — builds on understanding what a multiple is and why inflated TTM revenue matters. This is your bedrock.</div>
-      </div>
-    </div>
-
-    <!-- DAY 2 -->
-    <div class="day-card" id="day-2">
-      <div class="day-header" onclick="toggleDay('day-2')">
-        <button class="complete-btn" onclick="completeDay(event,'day-2')">✓</button>
-        <div class="day-number">Day 02</div>
-        <div class="day-title">DCF Deep Dive — Learn the Model</div>
-        <div class="day-date">Mon Mar 30</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: How DCF actually works in music context</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Open and play with the <a class="task-link" href="https://docs.google.com/spreadsheets/d/1NEnR3OTlB6E1nfT3k0xfJi3VvKpRBnEfS3r2DgJ8x7E/edit" target="_blank">Alderbrook open-source DCF Google Sheet</a> (linked within the Substack). Change numbers and watch how values shift.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.longangle.com/alts-education/music-royalties" target="_blank">Long Angle — Music Royalties Investment Guide 2025</a>. Best current overview of how institutional investors think about catalog as an asset class.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.marsmarkets.com/article-details/valuations-101-how-music-assets-are-valued" target="_blank">Mars Market — Valuations 101</a>. Good on the "step change" option value concept — directly relevant to your thesis.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Scipio's example: if Kate Bush's catalog earned $100K/year pre-Stranger Things and $300K during the spike, what TTM revenue gets used for valuation? What happens to valuation if the spike is temporary? Run the actual math with a 16x multiple.</span></li>
-        </ul>
-        <div class="day-note"><strong>Key insight to internalize:</strong> DCF forces you to project the future. Multiples assume the past is the future. Your thesis lives in that gap.</div>
-      </div>
-    </div>
-
-    <!-- DAY 3 -->
-    <div class="day-card" id="day-3">
-      <div class="day-header" onclick="toggleDay('day-3')">
-        <button class="complete-btn" onclick="completeDay(event,'day-3')">✓</button>
-        <div class="day-number">Day 03</div>
-        <div class="day-title">ABS Financing — Scipio's World</div>
-        <div class="day-date">Tue Mar 31</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: What ABS is, how it works, why it matters for your thesis</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.billboard.com/pro/music-catalog-market-asset-backed-securities/" target="_blank">Billboard — How Asset-Backed Securities Are Changing the Music Catalog Market</a>. Best single explainer on ABS in the music industry. Read every word.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.apollo.com/insights-news/insights/2025/01/apollo-leads-largest-ever-music-abs-transaction-for-concord" target="_blank">Apollo — Concord Largest-Ever Music ABS Transaction</a>. This is literally Scipio's team's deal. Read the quotes from him and Bret Leas carefully.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://structuredfinance.org/wp-content/uploads/2019/06/SFA-Research-Corner_-Music-Royalty-ABS-%E2%80%94-Remastered-for-Streaming-and-Beyond-3.pdf" target="_blank">Structured Finance Association — Music Royalty ABS Primer</a>. More technical but worth it for the collateral/vintage section.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Write out Scipio's $100M → $150M → debt upsize example by hand. Verify: $150M × 65% = $97.5M. Incremental proceeds = $32.5M. Make sure you can explain this verbally.</span></li>
-        </ul>
-        <div class="day-note"><strong>The key connection to your thesis:</strong> If exploitation events inflate TTM revenue, and that feeds into catalog valuation, and that valuation supports ABS debt at 65% LTV — then a temporary spike has real downstream leverage consequences. That's your most sophisticated argument.</div>
-      </div>
-    </div>
-
-    <!-- DAY 4 -->
-    <div class="day-card" id="day-4">
-      <div class="day-header" onclick="toggleDay('day-4')">
-        <button class="complete-btn" onclick="completeDay(event,'day-4')">✓</button>
-        <div class="day-number">Day 04</div>
-        <div class="day-title">ABS Part II — Deals & Real Numbers</div>
-        <div class="day-date">Wed Apr 1</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Real deal examples, loan-to-value ratios, financing structures in practice</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.billboard.com/pro/blackstone-hipgnosis-music-catalog-acquisition-backing-1-5b-abs/" target="_blank">Billboard — Blackstone/Hipgnosis $1.5B ABS</a>. Walk through the deal mechanics: purchase price, debt assumed, Kroll valuation figure, LTV implied.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search MBW for "Hipgnosis valuation correction" — read at least two articles on why the NAV was reduced ~26%. This is your key example of valuation risk.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.digitalmusicnews.com/2024/02/21/kobalt-music-group-abs-sale-security/" target="_blank">Digital Music News — Kobalt $267M ABS</a>. Note the 8.25% discount rate applied to songs 18 months+ old. That's a DCF input.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> What is the implied valuation of Concord's catalog if their $850M ABS represents a 52% LTV? (Answer: ~$1.63B. Verify it.)</span></li>
-        </ul>
-        <div class="day-note"><strong>By end of Day 4</strong> you should be able to explain LTV ratio, why it matters, and how inflated revenue creates downstream financing risk — without looking at notes.</div>
-      </div>
-    </div>
-
-    <!-- DAY 5 -->
-    <div class="day-card" id="day-5">
-      <div class="day-header" onclick="toggleDay('day-5')">
-        <button class="complete-btn" onclick="completeDay(event,'day-5')">✓</button>
-        <div class="day-number">Day 05</div>
-        <div class="day-title">Deals That Matter — Bruce, Bob, Whitney</div>
-        <div class="day-date">Thu Apr 2</div>
-        <span class="day-tag tag-both">Read + Listen</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: How major catalog deals actually get structured and valued</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search Billboard or MBW: "Bruce Springsteen Sony catalog $500 million." Read the deal breakdown — note how the price implies a multiple and what assumptions back it up.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search MBW: "Primary Wave Whitney Houston Higher Love." Read how the Kygo/Stevie Winwood remix was a deliberate exploitation event — and the revenue/valuation impact. This is exactly Scipio's example from your meeting.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Listen:</strong> <a class="task-link" href="https://podcasts.apple.com/us/podcast/trapital/id1470003061" target="_blank">Trapital Podcast</a> — search for the "Investing in Music Rights with Shamrock Capital" episode (Oct 2025) and/or "Private Investors Love Music." 20–30 min each.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Listen:</strong> MBW Podcast — Larry Mestel (Primary Wave) episode. He talks about catalog exploitation strategy directly.</span></li>
-        </ul>
-        <div class="day-note"><strong>After today</strong> you should be able to name at least 4 major catalog deals, explain what multiple they implied, and describe how the buyer thought about the catalog's earning potential.</div>
-      </div>
-    </div>
-
-    <!-- DAY 6 -->
-    <div class="day-card" id="day-6">
-      <div class="day-header" onclick="toggleDay('day-6')">
-        <button class="complete-btn" onclick="completeDay(event,'day-6')">✓</button>
-        <div class="day-number">Day 06</div>
-        <div class="day-title">Luminate — Your Empirical Backbone</div>
-        <div class="day-date">Fri Apr 3</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Understand what Luminate measures and how to cite it</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Download: <a class="task-link" href="https://luminatedata.com/reports/yearend-music-industry-report-2024/" target="_blank">Luminate 2024 Year-End Report</a>. Focus on the sections on catalog consumption, music documentaries, and viral event impact. Note the Beach Boys +3.6% catalog lift post-documentary.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.attheedge.blog/articles/luminate-2024-report-key-takeaways" target="_blank">At The Edge — 10 Takeaways from Luminate 2024</a>. Good synthesis of the catalog-relevant findings.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search Luminate's website for any special report on "music rights as an asset class" — they published one specifically on catalog investment. Read the executive summary.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Note what Luminate CAN and CANNOT tell you</strong> — it gives consumption data, not royalty revenue data. That distinction matters for your methodology section.</span></li>
-        </ul>
-        <div class="day-note"><strong>Scipio told you directly</strong> to use Luminate. Citing their mid-year and year-end reports in your proposal signals to any industry reader you know where real data lives.</div>
-      </div>
-    </div>
-
-    <!-- DAY 7 -->
-    <div class="day-card" id="day-7">
-      <div class="day-header" onclick="toggleDay('day-7')">
-        <button class="complete-btn" onclick="completeDay(event,'day-7')">✓</button>
-        <div class="day-number">Day 07</div>
-        <div class="day-title">Case Study Recon — Step Change vs. Spike</div>
-        <div class="day-date">Sat Apr 4</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Build your preliminary timeline for each case study</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Kate Bush:</strong> Find 2023+ coverage tracking whether her streaming stayed elevated post-Stranger Things. Search "Kate Bush streaming 2023 2024 Stranger Things lasting impact."</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Fleetwood Mac:</strong> Find data on whether the TikTok "Dreams" spike produced lasting streaming or reverted. Search "Fleetwood Mac Dreams streaming 2021 2022 aftermath."</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>ABBA:</strong> Find coverage on Voyage revenue through 2023–2024. You already have the MBW article ($129M in 2023). Find what catalog streaming looked like.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Deliverable:</strong> For each case, write 3–4 bullet points: pre-event baseline, spike magnitude, post-event trajectory, early verdict (step change or revert?).</span></li>
-        </ul>
-        <div class="day-note"><strong>End of Week 1 checkpoint:</strong> You should now be able to explain multiples, DCF, ABS, LTV, and the step-change concept. If you can't do this verbally without notes, spend 30 min reviewing before starting Week 2.</div>
-      </div>
-    </div>
-
-    <!-- WEEK 2 -->
-    <div class="week-header">
-      <div class="week-label">Week 2</div>
-      <div class="week-theme">Synthesize, Source, Write</div>
-      <div class="week-divider"></div>
-    </div>
-
-    <!-- DAY 8 -->
-    <div class="day-card" id="day-8">
-      <div class="day-header" onclick="toggleDay('day-8')">
-        <button class="complete-btn" onclick="completeDay(event,'day-8')">✓</button>
-        <div class="day-number">Day 08</div>
-        <div class="day-title">Reputational Events — The Other Side</div>
-        <div class="day-date">Sun Apr 5</div>
-        <span class="day-tag tag-read">Read</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Negative exploitation events — the mirror image of your thesis</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search: "R. Kelly streaming decline catalog value" — find the most data-rich coverage of what happened to his streaming post-scandal and post-Surviving R. Kelly documentary.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search: "Queen Bohemian Rhapsody streaming step change 2019" — find data on whether their catalog maintained elevated streaming 3+ years post-film. This is Scipio's primary example.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search: "Ozzy Osbourne Black Sabbath death streaming" or any recent death-of-artist streaming data. What does catalog performance look like 6–12 months after?</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Decide: which of these (if any) do you want to include as a 4th case? Flag your working hypothesis for discussion.</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- DAY 9 -->
-    <div class="day-card" id="day-9">
-      <div class="day-header" onclick="toggleDay('day-9')">
-        <button class="complete-btn" onclick="completeDay(event,'day-9')">✓</button>
-        <div class="day-number">Day 09</div>
-        <div class="day-title">Library Sprint — Find Your 8 Sources</div>
-        <div class="day-date">Mon Apr 6</div>
-        <span class="day-tag tag-read">Research</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Lock in annotated bibliography sources from credible outlets</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>You already have 6:</strong> Shot Tower (2025), Alderbrook Substack, Billboard (ABS), Variety (Kate Bush), MBW (ABBA), Music Week (ABBA). These are solid.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Source 7:</strong> NYU library → Business Source Complete → search "music royalty securitization" or "intangible asset valuation entertainment." Find one peer-reviewed or industry report source you haven't used yet.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Source 8:</strong> Luminate 2024 Year-End Report as a formal citation. Format it as a report: Luminate. (2024). 2024 Year-End Music Industry Report. Luminate Data.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">For each source, answer in 2 sentences: (1) what it tells you about revenue durability, (2) how it connects to the financing implications. That's the annotation structure.</span></li>
-        </ul>
-        <div class="day-note"><strong>Remember:</strong> Annotations should NOT just summarize. The professor wants to see how each source serves your research questions. Connect every source to either "step change vs. spike" or "financing implications of TTM distortion."</div>
-      </div>
-    </div>
-
-    <!-- DAY 10 -->
-    <div class="day-card" id="day-10">
-      <div class="day-header" onclick="toggleDay('day-10')">
-        <button class="complete-btn" onclick="completeDay(event,'day-10')">✓</button>
-        <div class="day-number">Day 10</div>
-        <div class="day-title">Draft the Proposal — Statement of Purpose</div>
-        <div class="day-date">Tue Apr 7</div>
-        <span class="day-tag tag-write">Write</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Sections 1 and 2 of the proposal</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Section 1 — Title:</strong> "How Exploitation Events Shape Music Catalog Value: Revenue Durability in the Streaming Era (2020–2025)." Done.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Section 2 — Statement of Purpose draft:</strong> Write 2 paragraphs. Para 1: the problem (TTM multiples assume revenue predictability; exploitation events distort that). Para 2: your objective and two research questions. Bring draft to me.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>RQ1 draft:</strong> "What revenue durability patterns do high-visibility catalog exploitation events produce in the streaming era?" Refine as needed.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>RQ2 draft:</strong> "How do durability patterns differ across passive sync placement, organic social virality, sustained marketing campaigns, and reputational events?" Refine as needed.</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- DAY 11 -->
-    <div class="day-card" id="day-11">
-      <div class="day-header" onclick="toggleDay('day-11')">
-        <button class="complete-btn" onclick="completeDay(event,'day-11')">✓</button>
-        <div class="day-number">Day 11</div>
-        <div class="day-title">Draft Context + Methodology Section</div>
-        <div class="day-date">Wed Apr 8</div>
-        <span class="day-tag tag-write">Write</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Section 3 — context, background, methodology, source integration</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write the context paragraph: current valuation benchmarks (16.1x NPS, 13.0x NLS per Shot Tower), why multiples dominate, and the core gap your study fills.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write the methodology paragraph: qualitative comparative case study, 3–4 event types, streaming data from Chartmetric and Luminate, pattern documentation not hypothesis testing.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write the financing implications paragraph: why valuations matter beyond sale transactions — ABS financing, LTV ratios, debt upsizing. Reference Apollo/Concord deal.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Integrate 3+ source citations from your bibliography within this section. Show the professor you've read them, not just listed them.</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- DAY 12 -->
-    <div class="day-card" id="day-12">
-      <div class="day-header" onclick="toggleDay('day-12')">
-        <button class="complete-btn" onclick="completeDay(event,'day-12')">✓</button>
-        <div class="day-number">Day 12</div>
-        <div class="day-title">Constituencies + Annotated Bibliography</div>
-        <div class="day-date">Thu Apr 9</div>
-        <span class="day-tag tag-write">Write</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Section 4 + full bibliography draft</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Constituency 1:</strong> Catalog asset managers and investment firms (Apollo, Blackstone, Lyra Capital) — need durability evidence for normalization decisions and ABS covenant assumptions.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Constituency 2:</strong> Mid-market music rights holders (Primary Wave, Reservoir, Concord) — need to understand whether exploitation campaigns produce durable value or financing-risk spikes.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Constituency 3:</strong> Music publishers and label sync/licensing executives — need to understand post-placement revenue behavior to advise on catalog timing and deal structure.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write all 8+ annotations (~100 words each). For each: 1–2 sentences describing the source, then connect specifically to your research questions.</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- DAY 13 -->
-    <div class="day-card" id="day-13">
-      <div class="day-header" onclick="toggleDay('day-13')">
-        <button class="complete-btn" onclick="completeDay(event,'day-13')">✓</button>
-        <div class="day-number">Day 13</div>
-        <div class="day-title">Full Draft Review — Bring to Me</div>
-        <div class="day-date">Fri Apr 10</div>
-        <span class="day-tag tag-review">Review</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Complete draft of both proposal and annotated bibliography</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Compile full proposal (3 pages): title, statement of purpose + 2 RQs, context/background/methodology, 3 constituencies.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Compile annotated bibliography (3 pages): 8+ entries in APA format, ~100 words each, emphasis on connection to your topic not just summary.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Share both drafts with me for feedback. We'll tighten language, check tone (sounds like industry, not classroom), and make sure nothing overclaims causality.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Check: does the proposal mention ABS financing implications? Does it use "step change vs. spike" language? Does it name specific firm types as constituencies?</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- DAY 14 -->
-    <div class="day-card" id="day-14">
-      <div class="day-header" onclick="toggleDay('day-14')">
-        <button class="complete-btn" onclick="completeDay(event,'day-14')">✓</button>
-        <div class="day-number">Day 14</div>
-        <div class="day-title">Polish + Submit</div>
-        <div class="day-date">Sat Apr 11</div>
-        <span class="day-tag tag-write">Final</span>
-        <div class="day-toggle">▾</div>
-      </div>
-      <div class="day-body">
-        <div class="day-focus">Focus: Final polish, APA formatting, submission prep</div>
-        <ul class="task-list">
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Implement all edits from Day 13 review. Final pass for tone — confident, direct, practitioner-facing.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Verify all APA citations are correctly formatted. Every bibliography entry: Author, A. A. (Year). Title of work. Source.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Confirm page counts: Proposal ≤ 3 pages, Bibliography ≤ 3 pages. Double-spaced.</span></li>
-          <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Submit by end of day Monday April 13. Do not wait until Sunday night — leave buffer for formatting issues.</span></li>
-        </ul>
-        <div class="day-note"><strong>Final mindset check:</strong> When you read the finished proposal, it should sound like someone who has spent real time in rooms where these deals get made. Not like a student paper about music. If in doubt, ask: would Scipio respect this?</div>
-      </div>
-    </div>
-
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="days-left">14</div><div class="stat-lbl">Days Left</div></div>
+    <div class="stat-card"><div class="stat-val" id="tasks-done">0<sup>/52</sup></div><div class="stat-lbl">Tasks Done</div></div>
+    <div class="stat-card"><div class="stat-val">4</div><div class="stat-lbl">Event Types</div></div>
+    <div class="stat-card"><div class="stat-val">8<sup>+</sup></div><div class="stat-lbl">Sources Needed</div></div>
   </div>
 
-  <!-- ===== READING LIST ===== -->
-  <div class="section" id="reading">
-    <h2 class="section-title">Master Reading List</h2>
-    <p class="section-subtitle">Every source you need, organized by topic and priority. High priority = read before Day 5. Don't just skim — annotate as you go.</p>
+  <div class="prog-label">Overall Progress</div>
+  <div class="prog-wrap"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
 
-    <div class="filter-bar">
-      <div class="filter-btn active" onclick="filterReading('all', this)">All</div>
-      <div class="filter-btn" onclick="filterReading('valuation', this)">Valuation</div>
-      <div class="filter-btn" onclick="filterReading('abs', this)">ABS / Financing</div>
-      <div class="filter-btn" onclick="filterReading('streaming', this)">Streaming Data</div>
-      <div class="filter-btn" onclick="filterReading('deals', this)">Deals</div>
-      <div class="filter-btn" onclick="filterReading('listen', this)">Podcasts</div>
+  <!-- WEEK 1 -->
+  <div class="week-head">
+    <div class="week-name">Week 1</div>
+    <div class="week-theme">Build the Financial Foundation</div>
+    <div class="week-div"></div>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="day-card" id="d1">
+    <div class="day-header" onclick="toggleDay('d1')">
+      <button class="complete-btn" onclick="completeDay(event,'d1')">✓</button>
+      <div class="day-num">Day 01</div>
+      <div class="day-title-text">TTM Multiples — Own the Foundation</div>
+      <div class="day-date-text">Sun Mar 29</div>
+      <span class="day-tag tag-read">Read</span>
+      <div class="day-toggle">▾</div>
     </div>
-
-    <div class="reading-grid" id="reading-grid">
-
-      <div class="reading-card priority-high" data-tags="valuation abs">
-        <span class="priority-badge badge-high">Must Read</span>
-        <div class="reading-type">Industry Report</div>
-        <div class="reading-title">Shot Tower Capital 2025 Music Report</div>
-        <div class="reading-source">Shot Tower Capital, April 2025</div>
-        <div class="reading-why">Your primary valuation benchmark source. Pages 12–18 give you the multiple data (16.1x NPS, 13.0x NLS), the growth correlation finding, and the ABS financing discount rate impact. Read actively — every time you see a number, ask what assumption it embeds.</div>
-        <div class="reading-tags"><span class="rtag rtag-valuation">Valuation</span><span class="rtag rtag-abs">ABS</span></div>
-        <div class="reading-week">Week 1, Day 1</div>
-      </div>
-
-      <div class="reading-card priority-high" data-tags="valuation">
-        <span class="priority-badge badge-high">Must Read</span>
-        <div class="reading-type">Substack / Analysis</div>
-        <div class="reading-title">Navigating Music Catalog Valuations: Part II</div>
-        <div class="reading-source">Alderbrook, August 2022</div>
-        <div class="reading-why">Best plain-English explanation of DCF vs. multiples available. Explicitly argues for normalizing one-off sync events and using DCF — which is the best-practice gap your thesis is built around. Includes an open-source Google Sheet DCF model you should actually use.</div>
-        <div class="reading-tags"><span class="rtag rtag-valuation">Valuation</span><span class="rtag rtag-foundational">Foundational</span></div>
-        <a class="reading-link" href="https://alderbrook.substack.com/p/navigating-music-catalog-valuations" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 1–2</div>
-      </div>
-
-      <div class="reading-card priority-high" data-tags="abs">
-        <span class="priority-badge badge-high">Must Read</span>
-        <div class="reading-type">Trade Article</div>
-        <div class="reading-title">How Asset-Backed Securities Are Changing the Music Catalog Market</div>
-        <div class="reading-source">Billboard, June 2024</div>
-        <div class="reading-why">The definitive explainer on ABS in music. Includes quotes from Concord CFO on LTV ratios ("low 40s" to 65%), the mechanics of how securitizations work vs. investment trusts, and why ABS has replaced public fund models. Essential for understanding how valuations feed financing.</div>
-        <div class="reading-tags"><span class="rtag rtag-abs">ABS</span><span class="rtag rtag-deals">Deals</span></div>
-        <a class="reading-link" href="https://www.billboard.com/pro/music-catalog-market-asset-backed-securities/" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 3</div>
-      </div>
-
-      <div class="reading-card priority-high" data-tags="abs deals">
-        <span class="priority-badge badge-high">Must Read</span>
-        <div class="reading-type">Deal Case Study</div>
-        <div class="reading-title">Apollo Leads Largest-Ever Music ABS for Concord</div>
-        <div class="reading-source">Apollo Global Management, January 2025</div>
-        <div class="reading-why">This is literally Scipio's team's deal — the $850M Concord ABS at 52% LTV. Read Scipio's own quotes carefully. Shows how catalog valuation (Kroll appraised at $5B+) translates directly into debt capacity. Your thesis connects to this exact mechanism.</div>
-        <div class="reading-tags"><span class="rtag rtag-abs">ABS</span><span class="rtag rtag-deals">Deals</span></div>
-        <a class="reading-link" href="https://www.apollo.com/insights-news/insights/2025/01/apollo-leads-largest-ever-music-abs-transaction-for-concord" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 3</div>
-      </div>
-
-      <div class="reading-card priority-high" data-tags="valuation">
-        <span class="priority-badge badge-high">Must Read</span>
-        <div class="reading-type">Accounting Firm Primer</div>
-        <div class="reading-title">A Primer for Valuation of Music Catalogs</div>
-        <div class="reading-source">Citrin Cooperman</div>
-        <div class="reading-why">Written by a valuation advisory firm. Explains all three valuation approaches (cost, market, income), why income approach dominates, and how representative earnings are determined. Specifically addresses how unpredictable popularity affects valuation — directly relevant to your thesis.</div>
-        <div class="reading-tags"><span class="rtag rtag-valuation">Valuation</span><span class="rtag rtag-foundational">Foundational</span></div>
-        <a class="reading-link" href="https://www.citrincooperman.com/infocus/a-primer-for-valuation-of-music-catalogs" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 1</div>
-      </div>
-
-      <div class="reading-card priority-high" data-tags="streaming">
-        <span class="priority-badge badge-high">Must Read</span>
-        <div class="reading-type">Industry Data Report</div>
-        <div class="reading-title">Luminate 2024 Year-End Music Report</div>
-        <div class="reading-source">Luminate Data, January 2025</div>
-        <div class="reading-why">Your empirical backbone, per Scipio's direct recommendation. Contains documentary-driven streaming lift data (Beach Boys +3.6%), catalog vs. current consumption breakdown, and methodology notes. Distinguishes "catalog" (18+ months old) from "deep catalog" (5+ years). Cite formally as a report.</div>
-        <div class="reading-tags"><span class="rtag rtag-streaming">Streaming</span><span class="rtag rtag-data">Data</span></div>
-        <a class="reading-link" href="https://luminatedata.com/reports/yearend-music-industry-report-2024/" target="_blank">Access →</a>
-        <div class="reading-week">Week 1, Day 6</div>
-      </div>
-
-      <div class="reading-card priority-medium" data-tags="abs">
-        <span class="priority-badge badge-medium">Important</span>
-        <div class="reading-type">Deal Report</div>
-        <div class="reading-title">Blackstone/Hipgnosis $1.5B ABS — LYRA Music Assets</div>
-        <div class="reading-source">Billboard, October 2024</div>
-        <div class="reading-why">The Hipgnosis catalog — 45,000 songs acquired for $1.6B — is now supporting a $1.5B ABS. Read for the mechanics of how a catalog's appraised value (Kroll: $2.36B) supports debt capacity, and for the broader context of why Hipgnosis's NAV was reduced ~26% previously.</div>
-        <div class="reading-tags"><span class="rtag rtag-abs">ABS</span><span class="rtag rtag-deals">Deals</span></div>
-        <a class="reading-link" href="https://www.billboard.com/pro/blackstone-hipgnosis-music-catalog-acquisition-backing-1-5b-abs/" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 4</div>
-      </div>
-
-      <div class="reading-card priority-medium" data-tags="abs">
-        <span class="priority-badge badge-medium">Important</span>
-        <div class="reading-type">Structured Finance Primer</div>
-        <div class="reading-title">Music Royalty ABS — Remastered for Streaming and Beyond</div>
-        <div class="reading-source">Structured Finance Association, May 2023</div>
-        <div class="reading-why">More technical but valuable for the collateral vintage analysis — how catalog age affects cashflow stability vs. magnitude, and why rating agencies care about royalty predictability. Directly reinforces your argument that exploitation-driven spikes disrupt the "predictable income" assumption that ABS underwriting depends on.</div>
-        <div class="reading-tags"><span class="rtag rtag-abs">ABS</span><span class="rtag rtag-foundational">Foundational</span></div>
-        <a class="reading-link" href="https://structuredfinance.org/wp-content/uploads/2019/06/SFA-Research-Corner_-Music-Royalty-ABS-%E2%80%94-Remastered-for-Streaming-and-Beyond-3.pdf" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 3</div>
-      </div>
-
-      <div class="reading-card priority-medium" data-tags="valuation deals">
-        <span class="priority-badge badge-medium">Important</span>
-        <div class="reading-type">Investment Guide</div>
-        <div class="reading-title">Music Royalties Investment Guide 2025</div>
-        <div class="reading-source">Long Angle, November 2025</div>
-        <div class="reading-why">Comprehensive institutional investor guide to music royalties as an asset class. Covers copyright structure, revenue streams, KPIs, valuation multiples, and large-scale deal examples. Explains the "superstar premium" (22–30x+ multiples) and how iconic narratives affect pricing — connects to your exploitation event thesis.</div>
-        <div class="reading-tags"><span class="rtag rtag-valuation">Valuation</span><span class="rtag rtag-deals">Deals</span></div>
-        <a class="reading-link" href="https://www.longangle.com/alts-education/music-royalties" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 2</div>
-      </div>
-
-      <div class="reading-card priority-medium" data-tags="valuation">
-        <span class="priority-badge badge-medium">Important</span>
-        <div class="reading-type">Analysis</div>
-        <div class="reading-title">Valuations 101: How Music Assets Are Valued</div>
-        <div class="reading-source">Mars Market</div>
-        <div class="reading-why">Covers the "option value" of exploitation events within valuation frameworks — a TikTok moment or film placement represents upside that option pricing models try to capture. Directly relevant to your argument that multiples can't properly account for this. Good for the methodology section of your proposal.</div>
-        <div class="reading-tags"><span class="rtag rtag-valuation">Valuation</span></div>
-        <a class="reading-link" href="https://www.marsmarkets.com/article-details/valuations-101-how-music-assets-are-valued" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 2</div>
-      </div>
-
-      <div class="reading-card priority-medium" data-tags="streaming">
-        <span class="priority-badge badge-medium">Important</span>
-        <div class="reading-type">Data Takeaways</div>
-        <div class="reading-title">10 Takeaways from Luminate 2024 Year-End Report</div>
-        <div class="reading-source">At The Edge, March 2025</div>
-        <div class="reading-why">Quick synthesis of the catalog-relevant Luminate findings. Highlights the Beach Boys documentary-driven +3.6% catalog lift, and the broader finding that music documentaries produce "sustained increases" in catalog streaming. Useful for quickly locating the specific data points relevant to your thesis.</div>
-        <div class="reading-tags"><span class="rtag rtag-streaming">Streaming</span><span class="rtag rtag-data">Data</span></div>
-        <a class="reading-link" href="https://www.attheedge.blog/articles/luminate-2024-report-key-takeaways" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 6</div>
-      </div>
-
-      <div class="reading-card priority-medium" data-tags="abs deals">
-        <span class="priority-badge badge-medium">Important</span>
-        <div class="reading-type">Deal Report</div>
-        <div class="reading-title">Kobalt $267M Asset-Backed Security</div>
-        <div class="reading-source">Digital Music News, February 2024</div>
-        <div class="reading-why">Contains the Kroll valuation ($410M at 8.25% discount rate for songs 18+ months old, 11.75% for newer songs) — these are real DCF inputs used by rating agencies. The different discount rates for new vs. catalog songs shows how age and predictability affect valuation, supporting your revenue durability argument.</div>
-        <div class="reading-tags"><span class="rtag rtag-abs">ABS</span><span class="rtag rtag-valuation">Valuation</span></div>
-        <a class="reading-link" href="https://www.digitalmusicnews.com/2024/02/21/kobalt-music-group-abs-sale-security/" target="_blank">Read →</a>
-        <div class="reading-week">Week 1, Day 4</div>
-      </div>
-
-      <div class="reading-card priority-low" data-tags="listen">
-        <span class="priority-badge badge-low">Listen</span>
-        <div class="reading-type">Podcast Episode</div>
-        <div class="reading-title">Investing in Music Rights with Shamrock Capital</div>
-        <div class="reading-source">Trapital Podcast, October 2025 (~26 min)</div>
-        <div class="reading-why">Jason Sklar (Shamrock Capital) breaks down music rights as an asset class, valuation approaches, and catalog deal strategy. Practitioner-level language — you want to sound like this when you talk about your thesis. Also includes AI and gaming angles which are increasingly relevant to catalog exploitation.</div>
-        <div class="reading-tags"><span class="rtag rtag-deals">Deals</span><span class="rtag rtag-valuation">Valuation</span></div>
-        <a class="reading-link" href="https://podcasts.apple.com/us/podcast/trapital/id1470003061" target="_blank">Listen →</a>
-        <div class="reading-week">Week 1, Day 5</div>
-      </div>
-
-      <div class="reading-card priority-low" data-tags="listen">
-        <span class="priority-badge badge-low">Listen</span>
-        <div class="reading-type">Podcast Episode</div>
-        <div class="reading-title">MBW Podcast — Larry Mestel, CEO Primary Wave</div>
-        <div class="reading-source">Music Business Worldwide Podcast</div>
-        <div class="reading-why">Mestel talks directly about catalog exploitation strategy — including the Whitney Houston/Kygo remix Scipio referenced in your meeting. Primary Wave's model of "active management" of catalogs is the industry's best example of engineered positive exploitation. Essential for your constituency section.</div>
-        <div class="reading-tags"><span class="rtag rtag-deals">Deals</span></div>
-        <a class="reading-link" href="https://www.musicbusinessworldwide.com/podcast/" target="_blank">Listen →</a>
-        <div class="reading-week">Week 1, Day 5</div>
-      </div>
-
-      <div class="reading-card priority-low" data-tags="listen">
-        <span class="priority-badge badge-low">Listen</span>
-        <div class="reading-type">Podcast Episode</div>
-        <div class="reading-title">Duetti: The Financial Plumbing Behind Catalog Deals</div>
-        <div class="reading-source">Trapital Podcast, 2025</div>
-        <div class="reading-why">Lior Tibon (Duetti) breaks down how equity vs. debt get used differently in catalog acquisitions, how data and underwriting power rights-acquisition machines, and the mechanics of a $200M raise. Practical vocabulary builder for talking about deal structure fluently.</div>
-        <div class="reading-tags"><span class="rtag rtag-abs">ABS</span><span class="rtag rtag-deals">Deals</span></div>
-        <a class="reading-link" href="https://www.trapital.com/" target="_blank">Listen →</a>
-        <div class="reading-week">Week 1, Day 5</div>
-      </div>
-
+    <div class="day-body">
+      <div class="day-focus">Focus: How multiples work and why they dominate</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Shot Tower 2025 report — pages 12–18 (Private Market Valuation Trends). Read actively. Every time you see a multiple, ask what revenue assumption is baked in.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://alderbrook.substack.com/p/navigating-music-catalog-valuations" target="_blank">Alderbrook Substack — Navigating Catalog Valuations Part II</a>. Open the DCF Google Sheet and change numbers.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.citrincooperman.com/infocus/a-primer-for-valuation-of-music-catalogs" target="_blank">Citrin Cooperman — A Primer for Valuation of Music Catalogs</a>.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Write one page in your own words: what TTM multiples are, why they dominate, what DCF does differently. Don't move on until you can say it out loud without notes.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Shot Tower pg. 59 (Valuation Primer appendix) — read the NPS/NLS cash flow waterfall diagram. Memorize it.</span></li>
+      </ul>
+      <div class="day-note"><strong>Shot Tower key stat to internalize:</strong> Publishing multiples averaged 16.1x NPS in 2024. Multiples track actual industry growth almost exactly (pg. 16). That correlation is the mechanism your thesis exploits.</div>
     </div>
   </div>
 
-  <!-- ===== CONCEPTS ===== -->
-  <div class="section" id="concepts">
-    <h2 class="section-title">Finance Concepts</h2>
-    <p class="section-subtitle">The six concepts you need to own cold. Read each, then close the page and explain it out loud. If you can do that, you own it.</p>
-
-    <div class="concept-grid">
-
-      <div class="concept-card">
-        <div class="concept-number">Concept 01</div>
-        <div class="concept-title">TTM Revenue Multiples</div>
-        <div class="concept-explain">The dominant valuation method in music catalog transactions. You take the trailing twelve months of net revenue (NPS for publishing, NLS for recorded) and multiply by an industry benchmark. Current benchmarks: 16.1x NPS, 13.0x NLS. The multiple reflects market consensus about asset quality and growth expectations.</div>
-        <div class="concept-example"><strong>Why it matters for your thesis</strong>If an exploitation event floods the TTM window with non-recurring revenue, and a buyer applies 16x to that inflated figure, the valuation may embed earnings that won't repeat. That's the core distortion risk.</div>
-      </div>
-
-      <div class="concept-card">
-        <div class="concept-number">Concept 02</div>
-        <div class="concept-title">Discounted Cash Flow (DCF)</div>
-        <div class="concept-explain">Estimates the present value of all future expected cash flows, discounted by the cost of capital (WACC). Forces the analyst to project forward rather than assume the past repeats. The discount rate for stable catalog songs (18+ months old) is typically ~8.25%; for newer, riskier songs it's 11.75%+ (Kroll/Kobalt). DCF is best practice but harder to execute than multiples.</div>
-        <div class="concept-example"><strong>The tension your thesis exploits</strong>DCF requires an honest view of whether exploitation-driven revenue is durable. Multiples just apply a number to whatever TTM shows. That gap is where your research lives.</div>
-      </div>
-
-      <div class="concept-card">
-        <div class="concept-number">Concept 03</div>
-        <div class="concept-title">Asset-Backed Securitization (ABS)</div>
-        <div class="concept-explain">A financing structure where a company pools its royalty-generating assets into a trust and sells notes backed by those cash flows to institutional investors (pension funds, insurance companies). The trust pays interest from royalties. Music ABS has surged since 2022 — Concord ($1.8B, $850M), Hipgnosis ($1.5B), Kobalt ($267M) are all recent examples. Apollo (Scipio's firm) underwrites and anchors many of these.</div>
-        <div class="concept-example"><strong>The financing loop</strong>Catalog value → appraised by Kroll/Duff & Phelps → supports debt issuance at 52–65% LTV → if TTM revenue inflated by exploitation spike → valuation may be overstated → debt may be over-leveraged.</div>
-      </div>
-
-      <div class="concept-card">
-        <div class="concept-number">Concept 04</div>
-        <div class="concept-title">Loan-to-Value Ratio (LTV)</div>
-        <div class="concept-explain">The ratio of debt to the appraised value of the underlying asset. In music ABS, typical LTV is 52–65%. Lower LTV = more conservative (more equity buffer). Lenders get comfortable advancing capital at a target LTV based on third-party valuations. If the appraised value rises (due to exploitation-driven revenue), the company can "upsize" its debt — borrow more against the same catalog.</div>
-        <div class="concept-example"><strong>Scipio's example</strong>$100M catalog at 65% LTV = $65M debt. Catalog grows to $150M through exploitation campaigns. New debt capacity = $150M × 65% = $97.5M. Incremental proceeds = $32.5M. That's real money extracted without a sale.</div>
-      </div>
-
-      <div class="concept-card">
-        <div class="concept-number">Concept 05</div>
-        <div class="concept-title">Step Change vs. Spike</div>
-        <div class="concept-explain">Scipio's key framing — and the central analytical question of your thesis. A "step change" means streaming performance permanently elevated to a new, higher baseline after an exploitation event. A "spike" means a temporary surge that eventually reverts to pre-event levels. The distinction determines whether post-event revenue is durable (legitimate valuation input) or distortive (should be normalized).</div>
-        <div class="concept-example"><strong>Case study application</strong>Kate Bush: did streaming stay elevated in 2023–2024? Fleetwood Mac: did "Dreams" produce a new baseline or revert? ABBA: does Voyage represent a durable commercial renaissance? This is the question your empirical work answers.</div>
-      </div>
-
-      <div class="concept-card">
-        <div class="concept-number">Concept 06</div>
-        <div class="concept-title">Normalization</div>
-        <div class="concept-explain">The valuation practice of adjusting historical revenue to remove one-time or non-recurring items before applying multiples or building DCF projections. Alderbrook (2022) specifically recommends normalizing "unusually high sync" income. In practice, many buyers still apply multiples to un-normalized TTM figures — that's the gap your thesis documents and provides evidence to close.</div>
-        <div class="concept-example"><strong>Why practitioners need your research</strong>To normalize a spike, you need to know how large the spike was and how long it lasted. That's exactly the empirical pattern documentation your case studies provide. Your thesis = the data that makes normalization decisions evidence-based.</div>
-      </div>
-
+  <!-- DAY 2 -->
+  <div class="day-card" id="d2">
+    <div class="day-header" onclick="toggleDay('d2')">
+      <button class="complete-btn" onclick="completeDay(event,'d2')">✓</button>
+      <div class="day-num">Day 02</div>
+      <div class="day-title-text">DCF Deep Dive — Learn the Model</div>
+      <div class="day-date-text">Mon Mar 30</div>
+      <span class="day-tag tag-read">Read</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: How DCF actually works in a music catalog context</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.longangle.com/alts-education/music-royalties" target="_blank">Long Angle — Music Royalties Investment Guide 2025</a>. Best institutional investor overview available.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.marsmarkets.com/article-details/valuations-101-how-music-assets-are-valued" target="_blank">Mars Market — Valuations 101</a>. Focus on the "option value" section — TikTok moment = option that DCF doesn't capture well.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Passman Ch. 18-20 (Publishing income sources + sync licensing). Understand the income hierarchy: performance #1, mechanicals #2, sync #3. Sync's episodic nature is key.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Kate Bush earned ~$2.3M in one month from the Stranger Things spike. Her catalog likely earned ~$30K/month pre-event. Apply 16x to both. What's the valuation difference? ($480K/yr × 16x = $7.68M normal. $27.6M/yr × 16x = $441.6M spike. That gap is your thesis.)</span></li>
+      </ul>
+      <div class="day-note"><strong>Key insight:</strong> DCF forces you to project the future. Multiples assume the past is the future. Your thesis lives in that gap — specifically when the "past" includes a non-recurring spike.</div>
     </div>
   </div>
 
-  <!-- ===== VOCAB ===== -->
-  <div class="section" id="vocab">
-    <h2 class="section-title">Vocab & Cheat Sheet</h2>
-    <p class="section-subtitle">Flash card-style. Know every term cold. The formulas are ones you should be able to run mentally in a conversation.</p>
-
-    <div class="formula-block">
-      <div class="formula-label">The Core Valuation Formula</div>
-      <div class="formula"><span class="var">Catalog Value</span> <span class="eq">=</span> <span class="var">TTM Net Revenue</span> <span class="eq">×</span> <span class="var">Multiple (16.1x NPS / 13.0x NLS)</span></div>
-      <div class="formula-note">Your thesis: if TTM Net Revenue is inflated by a non-recurring exploitation event, the resulting Catalog Value is overstated by exactly (spike revenue × multiple). E.g., $100K spike × 16x = $1.6M valuation distortion.</div>
+  <!-- DAY 3 -->
+  <div class="day-card" id="d3">
+    <div class="day-header" onclick="toggleDay('d3')">
+      <button class="complete-btn" onclick="completeDay(event,'d3')">✓</button>
+      <div class="day-num">Day 03</div>
+      <div class="day-title-text">ABS Financing — Scipio's World</div>
+      <div class="day-date-text">Tue Mar 31</div>
+      <span class="day-tag tag-read">Read</span>
+      <div class="day-toggle">▾</div>
     </div>
-
-    <div class="formula-block">
-      <div class="formula-label">Scipio's Debt Upsize Formula</div>
-      <div class="formula"><span class="var">New Debt Capacity</span> <span class="eq">=</span> <span class="var">New Appraised Value</span> <span class="eq">×</span> <span class="var">LTV%</span><br><span class="var">Incremental Proceeds</span> <span class="eq">=</span> <span class="var">New Debt Capacity</span> <span class="eq">−</span> <span class="var">Old Debt</span></div>
-      <div class="formula-note">Example: $100M → $150M catalog. LTV = 65%. Old debt = $65M. New capacity = $97.5M. Incremental = $32.5M. This is how value creation is monetized without a sale.</div>
+    <div class="day-body">
+      <div class="day-focus">Focus: What ABS is, how it works, why it amplifies your thesis argument</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.billboard.com/pro/music-catalog-market-asset-backed-securities/" target="_blank">Billboard — How ABS Are Changing the Music Catalog Market</a>. Read every word. The Concord CFO quotes are gold.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.apollo.com/insights-news/insights/2025/01/apollo-leads-largest-ever-music-abs-transaction-for-concord" target="_blank">Apollo — Concord $850M ABS</a>. This is Scipio's team's deal. Read his quotes carefully.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Shot Tower pg. 18 — ABS vs. Bank Debt table. Memorize: ABS WACC = 8.38%, Bank = 9.51%. 1.13% lower. ABS buyer can pay ~10% more for same asset.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Shot Tower pg. 56-57 — Select Music ABS Pricing Data table. Note LTV ratios (52–65%) and discount rates (8.25%) used by Kroll to appraise catalogs.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Write out Scipio's math by hand: $100M × 65% = $65M debt → catalog grows to $150M → $150M × 65% = $97.5M → incremental $32.5M. Repeat until automatic.</span></li>
+      </ul>
+      <div class="day-note"><strong>The financing loop:</strong> Exploitation spike → inflated TTM → inflated Kroll appraisal → higher ABS debt capacity → if spike reverts, catalog is over-leveraged. That's the systemic risk your thesis documents.</div>
     </div>
-
-    <div class="formula-block">
-      <div class="formula-label">DCF Simplified</div>
-      <div class="formula"><span class="var">PV</span> <span class="eq">=</span> Σ <span class="var">CF(t)</span> <span class="eq">/</span> <span class="var">(1 + r)^t</span></div>
-      <div class="formula-note">PV = present value. CF(t) = cash flow in year t. r = discount rate (WACC). For stable catalog: r ≈ 8.25%. For new/risky songs: r ≈ 11.75%. Higher risk = higher discount = lower present value. Exploitation spikes that don't persist inflate CF(t) projections when recent TTM is used as the base.</div>
-    </div>
-
-    <br>
-
-    <div class="vocab-list">
-      <div class="vocab-item"><div class="vocab-term">TTM (Trailing Twelve Months)</div><div class="vocab-def">The last 12 months of revenue used as the base for valuation multiples. Central to your thesis — exploitation events that hit within this window directly affect calculated catalog value.</div></div>
-      <div class="vocab-item"><div class="vocab-term">NPS (Net Publisher's Share)</div><div class="vocab-def">The net income retained by a music publisher after paying the songwriter's share of royalties. Current benchmark multiple: 16.1x NPS for non-iconic, 17.5x for iconic catalogs.</div></div>
-      <div class="vocab-item"><div class="vocab-term">NLS (Net Label Share)</div><div class="vocab-def">The net income retained by a record label after artist royalties. Current benchmark: 13.0x NLS for non-iconic, 14.2x for iconic catalogs. Always trades at a discount to NPS due to more concentrated risk.</div></div>
-      <div class="vocab-item"><div class="vocab-term">WACC (Weighted Average Cost of Capital)</div><div class="vocab-def">The blended cost of a company's debt and equity financing. Used as the discount rate in DCF models. Lower WACC = higher catalog valuation. ABS financing lowers WACC by about 1.13% vs. bank debt (per Shot Tower), allowing buyers to pay ~10% more for the same asset.</div></div>
-      <div class="vocab-item"><div class="vocab-term">ABS (Asset-Backed Securitization)</div><div class="vocab-def">Financing structure where royalty-generating catalogs are pooled as collateral for notes sold to institutional investors. Rated by Kroll, Moody's. Music ABS market exceeded $4.4B in 2025.</div></div>
-      <div class="vocab-item"><div class="vocab-term">LTV (Loan-to-Value Ratio)</div><div class="vocab-def">Debt as a percentage of appraised asset value. Music ABS typically ranges from 52–65% LTV. Covenants require maintaining LTV below a threshold — if value drops, company may need to pay down debt.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Normalization</div><div class="vocab-def">Adjusting historical revenue figures to remove one-time or non-recurring items. Best practice per Alderbrook (2022) for sync income and exploitation event spikes. Not consistently applied in industry practice — that's your thesis problem.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Step Change</div><div class="vocab-def">A permanent upward shift in streaming performance following an exploitation event — the new baseline is sustainably higher than pre-event. Durable value creation. Represents legitimate valuation input.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Spike / Reversion</div><div class="vocab-def">A temporary surge in streaming that eventually returns to pre-event baseline. Creates TTM revenue distortion if it falls within the valuation window. Should be normalized — but often isn't.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Exploitation Event</div><div class="vocab-def">Any event that generates renewed attention to an existing catalog: sync placement, TikTok virality, biopic, anniversary campaign, artist death, remix. Can be positive (revenue-generating) or negative (reputational, revenue-destroying).</div></div>
-      <div class="vocab-item"><div class="vocab-term">Deep Catalog</div><div class="vocab-def">Luminate's definition: music streamed 5+ years after release. Rock is the most deep-catalog-heavy genre (72.6% of streams). Classic catalog is specifically valued for predictable, stable royalty income — predictability that exploitation events can temporarily distort.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Kroll Bond Rating Agency (KBRA)</div><div class="vocab-def">Third-party valuation and ratings agency used to appraise music catalogs and rate ABS notes. Kobalt's catalog appraised at $410M; Concord's at $5B+. Their valuations directly set the ABS debt capacity — which is why accurate TTM revenue inputs matter so much.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Iconic Premium</div><div class="vocab-def">The valuation premium paid for culturally significant catalogs (Beatles, Springsteen, Dylan). Multiples of 22–30x+ vs. 16x standard. Shot Tower (2025) notes these premiums are justified by perceived durability — which your thesis tests against empirical streaming data.</div></div>
-      <div class="vocab-item"><div class="vocab-term">Securitization vs. Investment Trust</div><div class="vocab-def">Investment trusts (Hipgnosis Songs Fund, Round Hill) were publicly traded catalog vehicles — now essentially gone. ABS is private, institutional, and has replaced them as the dominant financing vehicle. ABS investors have longer time horizons and don't face "trial in the court of public opinion."</div></div>
-    </div>
-
   </div>
 
+  <!-- DAY 4 -->
+  <div class="day-card" id="d4">
+    <div class="day-header" onclick="toggleDay('d4')">
+      <button class="complete-btn" onclick="completeDay(event,'d4')">✓</button>
+      <div class="day-num">Day 04</div>
+      <div class="day-title-text">ABS Part II — Real Deal Numbers</div>
+      <div class="day-date-text">Wed Apr 1</div>
+      <span class="day-tag tag-read">Read</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Real deal mechanics, LTV ratios, Kroll appraisals</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.billboard.com/pro/blackstone-hipgnosis-music-catalog-acquisition-backing-1-5b-abs/" target="_blank">Billboard — Blackstone/Hipgnosis $1.5B ABS</a>. Walk the deal: $1.6B purchase, Kroll appraised at $2.36B, $1.5B ABS at 62.5% LTV.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search MBW: "Hipgnosis NAV valuation reduction" — read 2 articles on why their NAV was cut ~26%. This is your primary example of valuation correction risk.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.digitalmusicnews.com/2024/02/21/kobalt-music-group-abs-sale-security/" target="_blank">Digital Music News — Kobalt $267M ABS</a>. Note the Kroll discount rates: 8.25% for songs 18+ months, 11.75% for newer songs.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Exercise:</strong> Concord's catalog = $5B+ (Kroll). $850M ABS. What is the implied LTV? ($850M ÷ $5B = 17% — well below the 52% stated. Verify using the Kroll report figure. Why does this matter for covenant headroom?)</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 5 -->
+  <div class="day-card" id="d5">
+    <div class="day-header" onclick="toggleDay('d5')">
+      <button class="complete-btn" onclick="completeDay(event,'d5')">✓</button>
+      <div class="day-num">Day 05</div>
+      <div class="day-title-text">Major Deals — Whitney, Bruce, Bob Dylan</div>
+      <div class="day-date-text">Thu Apr 2</div>
+      <span class="day-tag tag-both">Read + Listen</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: How deals actually get structured and what exploitation does to value</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search MBW: "Primary Wave Whitney Houston Higher Love Kygo." This is Scipio's example — a deliberately engineered positive exploitation event. What happened to streaming? To catalog value?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search Billboard: "Bruce Springsteen Sony $500 million." Note the implied multiple — what revenue base justifies that price?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Shot Tower pg. 54 — 2024 M&A Transactions table. Know: Queen to Sony ~$1B+, MJ/Sony JV ~$625M+, Pink Floyd ~$400M+, Hipgnosis to Blackstone ~$2.2B+.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Listen:</strong> <a class="task-link" href="https://podcasts.apple.com/us/podcast/trapital/id1470003061" target="_blank">Trapital — "Investing in Music Rights with Shamrock Capital"</a> (~26 min). Practitioner vocab builder.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Listen:</strong> MBW Podcast — Larry Mestel (Primary Wave) episode on catalog exploitation strategy.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 6 -->
+  <div class="day-card" id="d6">
+    <div class="day-header" onclick="toggleDay('d6')">
+      <button class="complete-btn" onclick="completeDay(event,'d6')">✓</button>
+      <div class="day-num">Day 06</div>
+      <div class="day-title-text">Luminate — Your Empirical Backbone</div>
+      <div class="day-date-text">Fri Apr 3</div>
+      <span class="day-tag tag-read">Read</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: What Luminate measures, what it can and can't tell you</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Download: <a class="task-link" href="https://luminatedata.com/reports/yearend-music-industry-report-2024/" target="_blank">Luminate 2024 Year-End Report</a>. Read catalog consumption section + music documentaries section. Note Beach Boys +3.6% lift post-documentary.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Shot Tower pg. 46 — Streaming by Vintage and Genre (Luminate data). Pre-2000 songs = only 11.8% of streams. Your case studies are in this range — understand baseline expectations.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read <a class="task-link" href="https://www.attheedge.blog/articles/luminate-2024-report-key-takeaways" target="_blank">At The Edge — 10 Takeaways from Luminate 2024</a>. Quick synthesis of catalog-relevant findings.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Note for methodology:</strong> Luminate measures consumption data (streams, units), NOT royalty revenue. That distinction must appear in your methodology section when you explain your data sources.</span></li>
+      </ul>
+      <div class="day-note"><strong>Scipio told you directly</strong> to use Luminate. Citing their reports signals to any industry reader you know where real data lives. It's your Exhibit A for streaming trajectory analysis.</div>
+    </div>
+  </div>
+
+  <!-- DAY 7 -->
+  <div class="day-card" id="d7">
+    <div class="day-header" onclick="toggleDay('d7')">
+      <button class="complete-btn" onclick="completeDay(event,'d7')">✓</button>
+      <div class="day-num">Day 07</div>
+      <div class="day-title-text">Case Study Recon — Step Change vs. Spike</div>
+      <div class="day-date-text">Sat Apr 4</div>
+      <span class="day-tag tag-read">Research</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Build your preliminary timeline for each case study</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Kate Bush:</strong> Search "Kate Bush Running Up That Hill streaming 2023 2024 Stranger Things lasting." Was she still elevated a year later? Two years later?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Fleetwood Mac:</strong> Search "Fleetwood Mac Dreams streaming 2021 2022 TikTok aftermath." Did the Dreams spike revert or hold?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>ABBA:</strong> You have the MBW article ($129M Voyage revenue in 2023). Find catalog streaming data 2022–2024. Is ABBA Gold still performing above pre-Voyage levels?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>4th case (TBD):</strong> Search "Queen Bohemian Rhapsody streaming step change 2019 2020 2021." Scipio's own example — does it show a permanent step change?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Deliverable:</strong> Fill in the Case Studies tab for each artist with your preliminary findings.</span></li>
+      </ul>
+      <div class="day-note"><strong>Week 1 checkpoint:</strong> You should be able to explain multiples, DCF, ABS, LTV, and step change vs. spike without notes. If not, spend 30 min reviewing before Week 2.</div>
+    </div>
+  </div>
+
+  <!-- WEEK 2 -->
+  <div class="week-head">
+    <div class="week-name">Week 2</div>
+    <div class="week-theme">Synthesize, Source, Write</div>
+    <div class="week-div"></div>
+  </div>
+
+  <!-- DAY 8 -->
+  <div class="day-card" id="d8">
+    <div class="day-header" onclick="toggleDay('d8')">
+      <button class="complete-btn" onclick="completeDay(event,'d8')">✓</button>
+      <div class="day-num">Day 08</div>
+      <div class="day-title-text">Reputational Events — The Other Side</div>
+      <div class="day-date-text">Sun Apr 5</div>
+      <span class="day-tag tag-read">Read</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Negative exploitation events — the mirror image of your thesis</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search: "R. Kelly streaming decline Surviving R. Kelly documentary catalog." Quantify the drop if data is available.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Search: "Michael Jackson streaming estate catalog value after death." Note how the MJ estate has managed long-term catalog value through active exploitation (Cirque, Sony JV, etc.).</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Decide: Does a reputational event go in as your 4th case study, or is it an acknowledgment in your methodology section? Both are defensible.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Update the Case Studies tab with any findings from negative event research.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 9 -->
+  <div class="day-card" id="d9">
+    <div class="day-header" onclick="toggleDay('d9')">
+      <button class="complete-btn" onclick="completeDay(event,'d9')">✓</button>
+      <div class="day-num">Day 09</div>
+      <div class="day-title-text">Library Sprint — Lock Your 8 Sources</div>
+      <div class="day-date-text">Mon Apr 6</div>
+      <span class="day-tag tag-read">Research</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Finalize annotated bibliography — 8 minimum, aim for 10</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>You have 7 confirmed:</strong> Shot Tower (2025), Alderbrook, Billboard (ABS), Variety (Kate Bush), MBW (ABBA), Music Week (ABBA), Passman. Fill in annotations in the Source Library tab.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Source 8:</strong> Luminate 2024 Year-End Report as a formal citation. Luminate. (2025). 2024 Year-End Music Industry Report. Luminate Data.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Source 9 (bonus):</strong> NYU library → Business Source Complete → search "music royalty securitization" or "entertainment asset valuation." Find one peer-reviewed source.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">For each annotation: answer (1) what does this tell me about revenue durability? (2) how does it connect to financing risk? That structure = an A annotation.</span></li>
+      </ul>
+      <div class="day-note"><strong>Remember:</strong> Annotations must NOT just summarize. The professor wants to see how each source serves your specific research questions.</div>
+    </div>
+  </div>
+
+  <!-- DAY 10 -->
+  <div class="day-card" id="d10">
+    <div class="day-header" onclick="toggleDay('d10')">
+      <button class="complete-btn" onclick="completeDay(event,'d10')">✓</button>
+      <div class="day-num">Day 10</div>
+      <div class="day-title-text">Draft Sections 1 & 2 of Proposal</div>
+      <div class="day-date-text">Tue Apr 7</div>
+      <span class="day-tag tag-write">Write</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Title + Statement of Purpose + Research Questions</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Use the Proposal Workspace tab. The draft text is pre-loaded — edit it to your voice.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">RQ1: "What revenue durability patterns do high-visibility catalog exploitation events produce in the streaming era (2020–2025)?"</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">RQ2: "How do durability patterns differ across passive sync placement, organic social virality, sustained marketing campaigns, and reputational events?"</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Read your draft out loud. Does it sound like someone who has spent time in rooms where these deals get made? If not, revise.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 11 -->
+  <div class="day-card" id="d11">
+    <div class="day-header" onclick="toggleDay('d11')">
+      <button class="complete-btn" onclick="completeDay(event,'d11')">✓</button>
+      <div class="day-num">Day 11</div>
+      <div class="day-title-text">Draft Section 3 — Context & Methodology</div>
+      <div class="day-date-text">Wed Apr 8</div>
+      <span class="day-tag tag-write">Write</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Background, methodology, source integration, financing implications</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write the valuation context paragraph: 16.1x NPS, 13.0x NLS, multiples track growth (Shot Tower 2025). Why TTM distortion matters.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write the methodology paragraph: qualitative comparative case study, 3–4 event types, Chartmetric + Luminate data, pattern documentation not hypothesis testing.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write the financing implications paragraph: ABS structures, LTV ratios, Kroll appraisals, debt upsizing. Reference Apollo/Concord deal. One paragraph — brief but present.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Weave in 3+ source citations within this section to show you've read the material.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 12 -->
+  <div class="day-card" id="d12">
+    <div class="day-header" onclick="toggleDay('d12')">
+      <button class="complete-btn" onclick="completeDay(event,'d12')">✓</button>
+      <div class="day-num">Day 12</div>
+      <div class="day-title-text">Constituencies + Annotated Bibliography Draft</div>
+      <div class="day-date-text">Thu Apr 9</div>
+      <span class="day-tag tag-write">Write</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Section 4 + full bibliography first draft</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Constituency 1:</strong> Catalog asset managers and investment firms (Apollo, Blackstone, Lyra Capital) — normalization decisions, sensitivity analysis, ABS covenant assumptions.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Constituency 2:</strong> Mid-market rights holders (Primary Wave, Reservoir, Concord) — exploitation campaign strategy, financing risk, value creation vs. distortion.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text"><strong>Constituency 3:</strong> Music publishers and label sync/licensing executives — post-placement revenue behavior, catalog timing, deal structure advice.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Write all 8+ annotations (~100 words each). Use annotations you drafted in the Source Library tab as a starting point.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 13 -->
+  <div class="day-card" id="d13">
+    <div class="day-header" onclick="toggleDay('d13')">
+      <button class="complete-btn" onclick="completeDay(event,'d13')">✓</button>
+      <div class="day-num">Day 13</div>
+      <div class="day-title-text">Full Draft Review</div>
+      <div class="day-date-text">Fri Apr 10</div>
+      <span class="day-tag tag-review">Review</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Complete assembled draft — share with Claude for feedback</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Compile full proposal (3 pages): title, statement of purpose + 2 RQs, context/background/methodology, 3 constituencies.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Compile annotated bibliography (3 pages): 8+ entries APA format, ~100 words each, emphasis on connection to thesis not just summary.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Self-check: Does the proposal mention ABS financing? Use "step change vs. spike"? Name specific firm types? Sound practitioner-facing?</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Paste full draft into Claude for feedback and tightening.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DAY 14 -->
+  <div class="day-card" id="d14">
+    <div class="day-header" onclick="toggleDay('d14')">
+      <button class="complete-btn" onclick="completeDay(event,'d14')">✓</button>
+      <div class="day-num">Day 14</div>
+      <div class="day-title-text">Polish + Submit</div>
+      <div class="day-date-text">Sat Apr 11</div>
+      <span class="day-tag tag-write">Final</span>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="day-focus">Focus: Final polish, APA check, submit by April 13 EOD</div>
+      <ul class="task-list">
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Implement all feedback edits. Final tone pass — confident, direct, practitioner-facing.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Verify all APA citations: Author, A. A. (Year). Title. Source. Every entry.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Confirm page counts: Proposal ≤ 3 pages, Bibliography ≤ 3 pages. Double-spaced.</span></li>
+        <li class="task-item"><div class="task-check" onclick="checkTask(this)"></div><span class="task-text">Submit Monday April 13. Leave buffer — don't wait until Sunday night.</span></li>
+      </ul>
+      <div class="day-note"><strong>Final mindset check:</strong> Read the finished proposal. Would Scipio respect it? Does it sound like someone who has spent real time around catalog deals — not like a student paper?</div>
+    </div>
+  </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════
+     SOURCE LIBRARY
+══════════════════════════════════════════════════ -->
+<div class="section" id="sources">
+  <h2 class="sec-title">Source Library</h2>
+  <p class="sec-sub">All 10 sources with key data points extracted. Write your annotation in the box under each — that text becomes your annotated bibliography entry.</p>
+
+  <div class="proposal-intro" style="border-left-color:var(--cerulean);margin-bottom:28px;">
+    <p><strong>TLDR — What you need from this tab:</strong> Shot Tower and Alderbrook are your two must-cite foundational sources. Kate Bush (Aswath/Variety) and ABBA (Paine/Music Week + Dalugdug/MBW) are your two primary case study sources. Passman and Luminate are your foundational context sources. Billboard ABS article is your financing link. Fill in every annotation box — that's your actual deliverable for April 13.</p>
+  </div>
+
+  <div class="source-filter">
+    <div class="sfbtn active" onclick="filterSources('all',this)">All</div>
+    <div class="sfbtn" onclick="filterSources('core',this)">Core</div>
+    <div class="sfbtn" onclick="filterSources('abs',this)">ABS</div>
+    <div class="sfbtn" onclick="filterSources('val',this)">Valuation</div>
+    <div class="sfbtn" onclick="filterSources('stream',this)">Streaming</div>
+    <div class="sfbtn" onclick="filterSources('found',this)">Foundational</div>
+  </div>
+
+  <div class="source-grid" id="source-grid">
+
+    <div class="src-card priority-core" data-tags="core val abs">
+      <span class="src-badge badge-core">Must Read</span>
+      <div class="src-type">Industry Report</div>
+      <div class="src-title">2024 Year in Review & Music Industry Outlook</div>
+      <div class="src-author">Dunn, D., Law, R., Saggar, S., & DeLonde, A. — Shot Tower Capital / RedBrick Advisors, April 2025</div>
+      <div class="src-why">Your primary valuation benchmark source. Establishes 16.1x NPS and 13.0x NLS as 2024 market multiples, proves multiples track actual growth nearly exactly (pg. 16), and documents the ABS financing mechanism that amplifies your thesis argument (pg. 18).</div>
+      <div class="src-data">
+        <strong>Key Data Points</strong>
+        Publishing: 16.1x NPS (ex-iconic), 17.5x incl. iconic · Recorded: 13.0x NLS (ex-iconic) · ABS lowers WACC by 1.13% vs. bank debt · ABS buyer can pay ~10% more for same asset · Discount rate for ABS: 8.25%–8.75% at 65% LTV · Iconic transactions: 18x–30x+ multiples · Valuation correlation to growth = HIGH; to interest rates = LOW
+      </div>
+      <div class="src-tags"><span class="stag stag-val">Valuation</span><span class="stag stag-abs">ABS</span></div>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="Write your annotation here. Remember: connect to your research questions, don't just summarize. How does this source help you answer 'what revenue durability patterns do exploitation events create?' and 'how do patterns differ by event type?'"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-core" data-tags="core val">
+      <span class="src-badge badge-core">Must Read</span>
+      <div class="src-type">Substack / Analysis</div>
+      <div class="src-title">Navigating Music Catalog Valuations: Part II</div>
+      <div class="src-author">Stone, J. — Alderbrook, August 29, 2022</div>
+      <div class="src-why">Best-practice explainer for the conceptual gap at your thesis's center. Explicitly recommends normalizing "unusually high sync" income and using DCF — the exact practice your thesis argues industry isn't consistently following. Includes an open-source DCF Google Sheet.</div>
+      <div class="src-data">
+        <strong>Key Argument</strong>
+        "While investors do typically consider multiples during their evaluation process, they typically rely more heavily on DCF models." Recommends normalizing one-off events. DCF requires projecting forward; multiples assume past = future. The tension between best practice and industry behavior is your entire thesis problem.
+      </div>
+      <div class="src-tags"><span class="stag stag-val">Valuation</span><span class="stag stag-found">Foundational</span></div>
+      <a class="src-link" href="https://alderbrook.substack.com/p/navigating-music-catalog-valuations" target="_blank">Read →</a>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="Connect to your RQs: Alderbrook explicitly identifies the normalization gap your thesis addresses. How does this source frame the problem?"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-core" data-tags="core abs">
+      <span class="src-badge badge-core">Must Read</span>
+      <div class="src-type">Trade Article</div>
+      <div class="src-title">How Asset-Backed Securities Are Changing the Music Catalog Market</div>
+      <div class="src-author">Billboard, June 2024</div>
+      <div class="src-why">The definitive ABS explainer. Concord CFO confirms LTV ratios of "low 40s" to 65%. Explains how ABS replaced public fund model. Essential for connecting catalog valuation to ongoing financing structures — not just point-of-sale transactions.</div>
+      <div class="src-data">
+        <strong>Key Quote (paraphrase)</strong>
+        Concord CFO: preferred ABS flexibility because it allows drawing new debt for new acquisitions when within LTV covenants. ABS creates a trust using catalog royalties as collateral. Total music ABS 2022–2024: $3.3B+ raised by Concord, Kobalt, HarbourView, Chord, and others.
+      </div>
+      <div class="src-tags"><span class="stag stag-abs">ABS</span><span class="stag stag-val">Deals</span></div>
+      <a class="src-link" href="https://www.billboard.com/pro/music-catalog-market-asset-backed-securities/" target="_blank">Read →</a>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="How does this source extend your thesis beyond point-of-sale? What's the connection between TTM distortion and ABS financing risk?"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-core" data-tags="core stream">
+      <span class="src-badge badge-core">Must Read</span>
+      <div class="src-type">Trade Article</div>
+      <div class="src-title">Kate Bush's "Running Up That Hill" Streams Soar 8,000% Thanks to Stranger Things</div>
+      <div class="src-author">Aswad, J. — Variety, July 13, 2022</div>
+      <div class="src-why">Primary source documentation for your central case study. Establishes the scale of the spike (9,900% US Spotify increase), the mechanism (Stranger Things Season 4 placement), and the timeline. Your empirical anchor for the passive sync event type.</div>
+      <div class="src-data">
+        <strong>Key Data</strong>
+        ~9,900% increase in U.S. Spotify streams · First time charting on Billboard Hot 100 in 37 years · Also relevant: Mui (Fortune, 2022) reports ~$2.3M earned in one month from the placement · Song originally released 1985
+      </div>
+      <div class="src-tags"><span class="stag stag-stream">Streaming</span></div>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="Document the spike. Then address the durability question: what does the post-2022 trajectory show? Is this a step change or a revert?"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-core" data-tags="core stream">
+      <span class="src-badge badge-core">Must Read</span>
+      <div class="src-type">Trade Article</div>
+      <div class="src-title">One Year On, How Avatar Concert ABBA Voyage Is Powering the Group's Classic Catalogue</div>
+      <div class="src-author">Paine, A. — Music Week, June 28, 2023</div>
+      <div class="src-why">Primary source for your sustained marketing campaign case study. Documents how Voyage launch drove catalog streaming and commercial performance, with ABBA Gold re-entering charts. Represents the "manufactured positive exploitation event" Scipio described in your meeting.</div>
+      <div class="src-data">
+        <strong>Key Data</strong>
+        ABBA Gold was 10th biggest album of 2022 · Voyage arena generated $129M in 2023 (MBW, Dalugdug 2024) · $113M in 2024 (MBW, Tencer 2025) · Classic catalog commercial renaissance sustained over 3+ years
+      </div>
+      <div class="src-tags"><span class="stag stag-stream">Streaming</span></div>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="ABBA is your strongest step-change candidate. How does this source support that verdict? What distinguishes a sustained campaign from a spike?"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-support" data-tags="val found">
+      <span class="src-badge badge-support">Important</span>
+      <div class="src-type">Book</div>
+      <div class="src-title">All You Need to Know About the Music Business (11th ed.)</div>
+      <div class="src-author">Passman, D. S. — Simon & Schuster, 2023</div>
+      <div class="src-why">Foundational industry reference establishing the revenue hierarchy (performance #1, mechanical #2, sync #3) and the inherently episodic nature of sync income. Provides the conceptual baseline showing that catalog value has always been predicated on stable, predictable royalty streams — exactly what exploitation events disrupt.</div>
+      <div class="src-data">
+        <strong>Key Framework</strong>
+        Sync licensing fees are "all over the board" — inherently variable. Publishing income sources hierarchy: performance → mechanical → sync. Catalog value built on consistent royalty income. Passman explicitly notes that a publishing company without active writers "only needs someone to make sure they get paid everything they're owed" — i.e., predictable collection of stable income.
+      </div>
+      <div class="src-tags"><span class="stag stag-found">Foundational</span><span class="stag stag-val">Valuation</span></div>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="How does Passman's foundational framework set up your thesis problem? Use the sync income hierarchy and variability argument."></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-support" data-tags="stream">
+      <span class="src-badge badge-support">Important</span>
+      <div class="src-type">Industry Data Report</div>
+      <div class="src-title">2024 Year-End Music Industry Report</div>
+      <div class="src-author">Luminate Data, January 2025</div>
+      <div class="src-why">Your empirical backbone for streaming behavior data. Contains documentary-driven streaming lift evidence (Beach Boys +3.6% catalog lift post-documentary), catalog vs. current consumption breakdown, and methodology defining "catalog" (18+ months) vs. "deep catalog" (60+ months). Directly supports your methodology section.</div>
+      <div class="src-data">
+        <strong>Key Data</strong>
+        Beach Boys +3.6% catalog lift post-documentary · Total streams 4.8 trillion globally in 2024 (+14% YoY) · Catalog consumption = 73.3% of total · Rock: 72.6% of streams from deep catalog · Music documentaries = "sustained increases" in catalog streaming
+      </div>
+      <div class="src-tags"><span class="stag stag-stream">Streaming</span></div>
+      <a class="src-link" href="https://luminatedata.com/reports/yearend-music-industry-report-2024/" target="_blank">Access →</a>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="Luminate is your data infrastructure source. How does it enable your case study analysis? What are its limitations (consumption vs. revenue)?"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-support" data-tags="stream">
+      <span class="src-badge badge-support">Important</span>
+      <div class="src-type">Trade Article</div>
+      <div class="src-title">ABBA Voyage Generated $129M in 2023, as Virtual Concert Series Attracts 1.1M Visitors</div>
+      <div class="src-author">Dalugdug, M. — Music Business Worldwide, October 1, 2024</div>
+      <div class="src-why">Quantifies the sustained revenue impact of the ABBA Voyage campaign. Provides the commercial data ($129M annual revenue from the venue alone) that supports ABBA as the sustained marketing campaign case study. Pairs with Music Week (Paine 2023) to establish multi-year trajectory.</div>
+      <div class="src-data">
+        <strong>Key Data</strong>
+        $129M revenue in 2023 · 1.1M visitors to ABBA Arena · Tencer (MBW 2025): $113M in 2024 — sustained, not spike · Catalog streaming elevated across 2022–2024
+      </div>
+      <div class="src-tags"><span class="stag stag-stream">Streaming</span></div>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="Quantify the ABBA sustained trajectory. How does the multi-year revenue data support the step change verdict?"></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-support" data-tags="val found">
+      <span class="src-badge badge-support">Important</span>
+      <div class="src-type">Trade Article</div>
+      <div class="src-title">A Primer for Valuation of Music Catalogs</div>
+      <div class="src-author">Citrin Cooperman (valuation advisory firm)</div>
+      <div class="src-why">Third-party valuation firm perspective. Explains all three valuation approaches and why income approach dominates. Specifically addresses how "unpredictable popularity" affects valuation — directly your thesis topic. Written by practitioners who actually do these valuations for financing and transaction purposes.</div>
+      <div class="src-data">
+        <strong>Key Quote (paraphrase)</strong>
+        "A music catalog's earnings can change based upon unpredictable popularity. What is considered 'in' during one year can become stale and unappealing in a subsequent year." Recommends 5–7 year historical look-back to establish earnings trend — which an exploitation spike would distort.
+      </div>
+      <div class="src-tags"><span class="stag stag-val">Valuation</span><span class="stag stag-found">Foundational</span></div>
+      <a class="src-link" href="https://www.citrincooperman.com/infocus/a-primer-for-valuation-of-music-catalogs" target="_blank">Read →</a>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="How does this practitioner source validate your methodology? Use the unpredictable popularity quote and the 5-7 year look-back recommendation."></textarea>
+      </div>
+    </div>
+
+    <div class="src-card priority-support" data-tags="stream">
+      <span class="src-badge badge-support">Important</span>
+      <div class="src-type">Trade Article</div>
+      <div class="src-title">Here's a Timeline of the Viral "Dreams" TikTok</div>
+      <div class="src-author">Aniftos, R. — Billboard, October 14, 2020</div>
+      <div class="src-why">Primary source documentation for your organic social virality case study. Establishes the event timeline (Sept–Oct 2020), scale of the Dreams spike, and Fleetwood Mac's response. Your empirical anchor for comparing viral event durability against sync and campaign-driven events.</div>
+      <div class="src-data">
+        <strong>Key Timeline</strong>
+        Sept 25, 2020: Nathan Apodaca TikTok posted · Sept 26: Fleetwood Mac stamp of approval · Oct 4: Mick Fleetwood recreates the TikTok · Dreams re-entered charts for first time since 1977 · U.S. Spotify streams spiked dramatically — exact figures in MBW coverage
+      </div>
+      <div class="src-tags"><span class="stag stag-stream">Streaming</span></div>
+      <div class="annotation-area">
+        <div class="annotation-label">Your Annotation (~100 words)</div>
+        <textarea class="annotation-box" placeholder="Document the viral event timeline. What does the post-2020 trajectory show? How does Fleetwood Mac compare to Kate Bush and ABBA in terms of durability?"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CASE STUDIES
+══════════════════════════════════════════════════ -->
+<div class="section" id="cases">
+  <h2 class="sec-title">Case Study Tracker</h2>
+  <p class="sec-sub">Track each case study's pre-event baseline, spike, post-event trajectory, and your working verdict. Fill in as your research develops.</p>
+
+  <div class="proposal-intro" style="border-left-color:var(--cerulean);margin-bottom:28px;">
+    <p><strong>TLDR — Where each case stands:</strong> <strong>ABBA</strong> = your strongest step-change candidate (3+ years sustained revenue). <strong>Kate Bush</strong> = most dramatic spike, verdict TBD pending 2023–2024 streaming data. <strong>Fleetwood Mac</strong> = preliminary spike verdict, hypothesis to verify. <strong>4th case (TBD)</strong> = Queen/Bohemian Rhapsody is Scipio's recommended example — he co-owns the catalog. Your thesis gets its nuance from ABBA showing that not all exploitation events distort — some create genuine durable value.</p>
+  </div>
+
+  <div class="case-grid">
+
+    <!-- KATE BUSH -->
+    <div class="case-card">
+      <div class="case-header">
+        <div>
+          <div class="case-artist">Kate Bush</div>
+          <div class="case-song">"Running Up That Hill" (1985)</div>
+        </div>
+        <span class="case-type type-sync">Passive Sync</span>
+      </div>
+      <div class="case-timeline">
+        <div class="timeline-row">
+          <div class="tl-dot filled"></div>
+          <div class="tl-content"><span class="tl-label">Pre-Event Baseline</span>Cult following, minimal mainstream streaming. Low monthly U.S. stream counts. Deep catalog tier.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot highlight"></div>
+          <div class="tl-content"><span class="tl-label">The Event</span>Stranger Things S4 premiere, May 2022. U.S. Spotify streams +9,900%. ~$2.3M earned in one month. First Hot 100 appearance in 37 years.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot"></div>
+          <div class="tl-content"><span class="tl-label">Post-Event Trajectory (fill in)</span>
+            <textarea class="notes-input" placeholder="What did streaming look like in 2023? 2024? Did it revert to pre-event baseline or settle at a new higher level? Search 'Kate Bush streaming 2023 2024' and fill in here."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="verdict-area tbd">
+        <div class="verdict-label">Working Verdict</div>
+        <div class="verdict-text">TBD — Research in progress. Early signal suggests multi-year elevated interest (released Best of album Oct 2024), but whether streaming sustained vs. reverted requires data.</div>
+      </div>
+      <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Valuation Implication</div>
+      <div style="font-size:12px;line-height:1.6;color:#3a3a3a;">If $2.3M/month spike was included in TTM → catalog valued at ~$440M+. If spike reverted to $40K/month baseline → actual value ~$7.7M. That's a ~57x valuation distortion if multiples were applied to spike revenue.</div>
+    </div>
+
+    <!-- FLEETWOOD MAC -->
+    <div class="case-card">
+      <div class="case-header">
+        <div>
+          <div class="case-artist">Fleetwood Mac</div>
+          <div class="case-song">"Dreams" (1977)</div>
+        </div>
+        <span class="case-type type-viral">Organic Virality</span>
+      </div>
+      <div class="case-timeline">
+        <div class="timeline-row">
+          <div class="tl-dot filled"></div>
+          <div class="tl-content"><span class="tl-label">Pre-Event Baseline</span>Legacy catalog, steady but unremarkable streaming. Dreams had not charted since 1977. Classic rock deep catalog tier.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot highlight"></div>
+          <div class="tl-content"><span class="tl-label">The Event</span>Nathan Apodaca TikTok, September 25, 2020. Dreams re-entered Billboard Hot 100. Mick Fleetwood recreated the TikTok Oct 4. Stevie Nicks followed Oct 5.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot"></div>
+          <div class="tl-content"><span class="tl-label">Post-Event Trajectory (fill in)</span>
+            <textarea class="notes-input" placeholder="Search 'Fleetwood Mac Dreams streaming 2021 2022 aftermath TikTok.' Did streams revert to pre-event levels within 6 months? 12 months? Note: Christine McVie's death (Nov 2022) may have created a secondary event."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="verdict-area spike">
+        <div class="verdict-label">Working Verdict</div>
+        <div class="verdict-text">Preliminary: Spike — TikTok virality appears to produce dramatic short-term spikes with reversion toward baseline. Hypothesis to verify with data.</div>
+      </div>
+      <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Note</div>
+      <div style="font-size:12px;line-height:1.6;color:#3a3a3a;">Christine McVie's death (Nov 2022) may have created a secondary exploitation event within the study period. Consider whether to treat this as a confounding factor or a second data point.</div>
+    </div>
+
+    <!-- ABBA -->
+    <div class="case-card">
+      <div class="case-header">
+        <div>
+          <div class="case-artist">ABBA</div>
+          <div class="case-song">Catalog / Voyage (2021–)</div>
+        </div>
+        <span class="case-type type-campaign">Sustained Campaign</span>
+      </div>
+      <div class="case-timeline">
+        <div class="timeline-row">
+          <div class="tl-dot filled"></div>
+          <div class="tl-content"><span class="tl-label">Pre-Event Baseline</span>Legacy catalog, ABBA Gold consistently strong but flat streaming. No new releases since 1982 prior to Voyage album.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot highlight"></div>
+          <div class="tl-content"><span class="tl-label">The Event</span>Voyage album release Nov 2021 + ABBA Arena opening May 2022. Sustained global marketing campaign. New music re-introduced catalog to younger audiences.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot filled"></div>
+          <div class="tl-content"><span class="tl-label">Post-Event Trajectory</span>ABBA Gold 10th biggest album of 2022. Voyage arena: $129M in 2023, $113M in 2024. Catalog streaming elevated through 2022–2024. Multi-year commercial renaissance.</div>
+        </div>
+      </div>
+      <div class="verdict-area step">
+        <div class="verdict-label">Working Verdict</div>
+        <div class="verdict-text">Step Change — Sustained marketing campaign appears to produce durable new baseline. ABBA is your strongest step-change candidate. Revenue sustained 3+ years post-launch.</div>
+      </div>
+      <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Valuation Implication</div>
+      <div style="font-size:12px;line-height:1.6;color:#3a3a3a;">ABBA's elevated TTM revenue post-Voyage appears to be legitimate valuation input — genuine durable growth, not distortive spike. This is the counter-case that gives your thesis nuance: not all exploitation events inflate valuations inappropriately.</div>
+    </div>
+
+    <!-- 4TH CASE (OPEN) -->
+    <div class="case-card">
+      <div class="case-header">
+        <div>
+          <div class="case-artist">4th Case: TBD</div>
+          <div class="case-song">Reputational or Biopic Event</div>
+        </div>
+        <span class="case-type type-reputational">Reputational</span>
+      </div>
+      <div class="case-timeline">
+        <div class="timeline-row">
+          <div class="tl-dot"></div>
+          <div class="tl-content"><span class="tl-label">Candidates (pick one)</span>Queen/Bohemian Rhapsody (2018, biopic) · R. Kelly/Surviving R. Kelly (2019, scandal) · MJ catalog post-Leaving Neverland (2019)</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot"></div>
+          <div class="tl-content"><span class="tl-label">Scipio's Recommendation</span>He mentioned Queen specifically — confirmed step change, sustained from 2018 through now. He co-owns the catalog at Apollo/Sony. It's his most credible case study recommendation.</div>
+        </div>
+        <div class="timeline-row">
+          <div class="tl-dot"></div>
+          <div class="tl-content"><span class="tl-label">Your Research Notes</span>
+            <textarea class="notes-input" placeholder="Search 'Queen Bohemian Rhapsody streaming step change 2019 2020 2021 2022.' Is Queen still streaming above pre-film baseline today? This would be the most credible 4th case given Scipio's direct involvement."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="verdict-area tbd">
+        <div class="verdict-label">Working Verdict</div>
+        <div class="verdict-text">TBD — Research required. Scipio specifically cited Queen as a step-change example during your meeting, making it a high-credibility candidate.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PROPOSAL WORKSPACE
+══════════════════════════════════════════════════ -->
+<div class="section" id="proposal">
+  <h2 class="sec-title">Proposal Workspace</h2>
+  <p class="sec-sub">Your writing space. Each section shows what's required and what to include — the words are yours. Target: 3 pages double-spaced total. Due April 13.</p>
+
+  <div class="proposal-intro" style="margin-bottom:24px;">
+    <p><strong>TLDR — What the professor is looking for:</strong> A specific, scoped topic that connects to real industry behavior. Evidence you've done preliminary research. Two research questions that are actually answerable with available data. Three constituencies that would genuinely benefit — name real firm types. Confidence without overclaiming. Sound like a strong student, not a professor. No causal claims. No abstract jargon.</p>
+  </div>
+
+  <div class="proposal-intro">
+    <p><strong>Requirements:</strong> (1) Working title. (2) Statement of purpose + objective + 2 research questions. (3) Context, background, methodology, source integration. (4) Three specific constituencies. <strong>Your writing only — no drafts here.</strong></p>
+  </div>
+
+  <div class="prop-sections">
+
+    <!-- SECTION 1 -->
+    <div class="prop-section" id="ps1">
+      <div class="prop-sec-header" onclick="toggleProp('ps1')">
+        <div>
+          <div class="prop-sec-num">Section 1</div>
+          <div class="prop-sec-title">Working Title</div>
+          <div class="prop-sec-req">One line. Specific. Practitioner-facing.</div>
+        </div>
+        <div class="prop-sec-toggle">▾</div>
+      </div>
+      <div class="prop-sec-body">
+        <div class="draft-label">Your Title</div>
+        <div class="prop-rq">How Exploitation Events Shape Music Catalog Value: Revenue Durability in the Streaming Era (2020–2025)</div>
+        <div class="draft-note">This is your approved title. It signals scope, methodology, and the practical problem. Only change it if your professor requests it.</div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="prop-section" id="ps2">
+      <div class="prop-sec-header" onclick="toggleProp('ps2')">
+        <div>
+          <div class="prop-sec-num">Section 2</div>
+          <div class="prop-sec-title">Statement of Purpose</div>
+          <div class="prop-sec-req">Objective + 2 Research Questions</div>
+        </div>
+        <div class="prop-sec-toggle">▾</div>
+      </div>
+      <div class="prop-sec-body">
+        <div class="draft-label">What this section needs</div>
+        <div class="draft-note">2–3 paragraphs. Establish the problem (TTM multiples assume revenue predictability), state your objective (document durability patterns empirically), and land on your two research questions. Cite Shot Tower (2025) and Alderbrook (2022) to anchor the problem.</div>
+        <div class="writing-label">Your Statement of Purpose</div>
+        <textarea class="writing-area" style="min-height:180px;" placeholder="Write your statement of purpose here. Start with the industry problem, move to the gap, end with your objective. ~2 paragraphs."></textarea>
+        <div style="margin-top:16px;">
+          <div class="draft-label">Research Questions — Write yours below</div>
+          <div class="draft-note">RQ1 should address durability patterns broadly. RQ2 should address how patterns differ by event type. These are the questions your methodology must actually answer.</div>
+          <textarea class="writing-area" style="min-height:80px;" placeholder="RQ1: What revenue durability patterns do...&#10;RQ2: How do durability patterns differ across..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="prop-section" id="ps3">
+      <div class="prop-sec-header" onclick="toggleProp('ps3')">
+        <div>
+          <div class="prop-sec-num">Section 3</div>
+          <div class="prop-sec-title">Context, Background & Methodology</div>
+          <div class="prop-sec-req">Industry context · Research gap · Methodology · Source integration · Financing implications</div>
+        </div>
+        <div class="prop-sec-toggle">▾</div>
+      </div>
+      <div class="prop-sec-body">
+        <div class="draft-label">Context paragraph — what to cover</div>
+        <div class="draft-note">Establish the valuation benchmarks (16.1x NPS, 13.0x NLS per Shot Tower 2025). Explain that multiples track growth closely. Introduce your 3–4 case study events and why they matter. Name the gap: no systematic empirical data on post-event revenue durability. Cite Alderbrook (2022) for the normalization best practice that isn't being followed.</div>
+        <textarea class="writing-area" placeholder="Write your context paragraph here. ~150 words. Ground it in the industry reality, not theory."></textarea>
+
+        <div class="draft-label" style="margin-top:18px;">Methodology paragraph — what to cover</div>
+        <div class="draft-note">Name your 4 event types and their case study representatives. Name your data sources: Chartmetric, Luminate, Billboard, MBW, Shot Tower. State your approach: qualitative comparative case study, pattern documentation, no causal claims. This must be explicit about what you ARE and AREN'T claiming.</div>
+        <textarea class="writing-area" placeholder="Write your methodology paragraph here. ~100 words. Be precise about data sources and what you're measuring."></textarea>
+
+        <div class="draft-label" style="margin-top:18px;">Financing implications paragraph — what to cover</div>
+        <div class="draft-note">This is what separates your thesis from a generic streaming analysis. Explain that catalog valuations feed ABS financing at 52–65% LTV (Shot Tower 2025). If TTM is distorted by a spike, the downstream debt capacity may be over-stated. Reference the $3B+ raised in 2024. This paragraph shows you understand how the industry actually uses these valuations.</div>
+        <textarea class="writing-area" placeholder="Write your financing implications paragraph here. ~100 words. This is the Scipio angle — own it."></textarea>
+
+        <div style="margin-top:14px;">
+          <div class="draft-label">Section 3 Self-Check</div>
+          <ul class="checklist">
+            <li>16.1x NPS and 13.0x NLS cited with Shot Tower (2025)</li>
+            <li>Normalization gap identified — Alderbrook (2022) best practice vs. industry behavior</li>
+            <li>All 4 case studies named with event types</li>
+            <li>Data sources named: Chartmetric, Luminate, Billboard, MBW</li>
+            <li>ABS / financing implications included with LTV context</li>
+            <li>Methodology stated: qualitative, exploratory, comparative case study</li>
+            <li>No causal claims — "pattern documentation, not hypothesis testing"</li>
+            <li>At least 3 in-text citations woven through</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="prop-section" id="ps4">
+      <div class="prop-sec-header" onclick="toggleProp('ps4')">
+        <div>
+          <div class="prop-sec-num">Section 4</div>
+          <div class="prop-sec-title">Target Constituencies</div>
+          <div class="prop-sec-req">3 specific groups — name actual firm types, not generic categories</div>
+        </div>
+        <div class="prop-sec-toggle">▾</div>
+      </div>
+      <div class="prop-sec-body">
+        <div class="draft-label">Constituency 1 — what to cover</div>
+        <div class="draft-note">Catalog asset managers and investment firms. Name specific types: Apollo, Blackstone, Primary Wave, Reservoir, Lyra Capital, HarbourView. These are the people using Kroll appraisals to support ABS at 52–65% LTV. Why do they need your research? What decision does it inform?</div>
+        <textarea class="writing-area" placeholder="Write Constituency 1 here. Name real firms. Explain specifically how your durability findings help them make better normalization and financing decisions."></textarea>
+
+        <div class="draft-label" style="margin-top:18px;">Constituency 2 — what to cover</div>
+        <div class="draft-note">Music publishers and label executives managing catalog strategy. Name specific types: major publishers (UMG, Sony Music Publishing, Warner Chappell), larger independents (Concord, BMG, Kobalt). These are the people deciding when to sell, what to exploit, and how to set internal valuation benchmarks.</div>
+        <textarea class="writing-area" placeholder="Write Constituency 2 here. Focus on catalog strategy decisions — sale timing, exploitation planning, internal benchmarks."></textarea>
+
+        <div class="draft-label" style="margin-top:18px;">Constituency 3 — what to cover</div>
+        <div class="draft-note">This is your world. Music supervisors and sync licensing executives at publishers and labels. You have firsthand experience here from Flavorlab. Your thesis gives this group empirical evidence to support conversations about sync's long-term catalog value — not just the upfront fee. Own this one in your voice.</div>
+        <textarea class="writing-area" placeholder="Write Constituency 3 here. This is your professional lane — write it with confidence and specificity. What does your research let a music supervisor or sync exec say to their clients that they couldn't say before?"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     KEY DATA & FORMULAS
+══════════════════════════════════════════════════ -->
+<div class="section" id="data">
+  <h2 class="sec-title">Key Data & Formulas</h2>
+  <p class="sec-sub">Every number you need to know cold. Run these mentally in conversations.</p>
+
+  <div class="proposal-intro" style="border-left-color:var(--cerulean);margin-bottom:28px;">
+    <p><strong>TLDR — The 5 numbers that matter most:</strong> <strong>16.1x NPS</strong> (publishing multiple, 2024) · <strong>13.0x NLS</strong> (recorded multiple, 2024) · <strong>65% LTV</strong> (max ABS leverage) · <strong>8.25%</strong> (Kroll discount rate for stable catalog) · <strong>$3B+</strong> (music ABS raised in 2024). Everything else in this tab provides context for those five. If you can explain how they connect — multiples applied to inflated TTM → Kroll appraisal → 65% LTV ABS → debt upsize risk — you understand your thesis.</p>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">The Core Valuation Formula</div>
+    <div class="formula-body"><span class="fvar">Catalog Value</span> <span class="feq">=</span> <span class="fvar">TTM Net Revenue (NPS or NLS)</span> <span class="feq">×</span> <span class="fvar">Market Multiple</span></div>
+    <div class="formula-note">Your thesis: if TTM includes a non-recurring exploitation spike, the resulting catalog value is overstated by exactly (spike revenue × multiple). Kate Bush example: if $2.3M/month spike was annualized = $27.6M/yr. At 16x = $441.6M implied value. Real baseline ~$480K/yr = $7.7M. Distortion = $433.9M. That's the stakes.</div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">Scipio's Debt Upsize Formula</div>
+    <div class="formula-body">
+      <span class="fvar">New Debt Capacity</span> <span class="feq">=</span> <span class="fvar">New Appraised Value</span> <span class="feq">×</span> <span class="fvar">LTV%</span><br>
+      <span class="fvar">Incremental Proceeds</span> <span class="feq">=</span> <span class="fvar">New Debt Capacity</span> <span class="feq">−</span> <span class="fvar">Existing Debt</span>
+    </div>
+    <div class="formula-note">Example: $100M catalog at 65% LTV = $65M debt. Exploitation events grow value to $150M. New capacity = $97.5M. Incremental = $32.5M. This can be used to buy more catalogs or pay a dividend — without selling anything. If the $50M value increase was exploitation-driven and reverts, the catalog is now over-leveraged.</div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">ABS vs. Bank Debt — WACC Comparison (Shot Tower p.18)</div>
+    <div class="formula-body">
+      Bank Debt: WACC <span class="feq">=</span> <span class="fvar">9.51%</span> (55% LTV, 6.8% cost of debt)<br>
+      ABS: WACC <span class="feq">=</span> <span class="fvar">8.38%</span> (65% LTV, 6.5% cost of debt)
+    </div>
+    <div class="formula-note">1.13% difference allows ABS buyer to pay ~10% more for the same asset while maintaining the same 14.9% equity return. This means inflated TTM revenue × lower ABS discount rate = structurally higher transaction prices. Distortion is amplified in ABS environments.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="data-grid">
+    <div class="data-card">
+      <div class="data-card-title">2024 Private Market Benchmarks</div>
+      <div class="data-stat"><div class="data-num">16.1x</div><div class="data-desc">NPS multiple, publishing ex-iconic (2024)</div></div>
+      <div class="data-stat"><div class="data-num">17.5x</div><div class="data-desc">NPS including iconic transactions</div></div>
+      <div class="data-stat"><div class="data-num">13.0x</div><div class="data-desc">NLS multiple, recorded ex-iconic (2024)</div></div>
+      <div class="data-stat"><div class="data-num">18–30x</div><div class="data-desc">Iconic transaction range (Dylan, Springsteen, MJ)</div></div>
+      <div class="data-context">Source: Shot Tower Capital, April 2025. Multiples have been "incredibly consistent since 2021, despite rising rates." Three stabilizing factors: (1) continued growth, (2) predictability of income, (3) ABS leverage availability.</div>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">2024 Music ABS Market</div>
+      <div class="data-stat"><div class="data-num">$3B+</div><div class="data-desc">Total ABS raised in 2024 alone</div></div>
+      <div class="data-stat"><div class="data-num">65%</div><div class="data-desc">Max LTV in ABS structures (typical range 52–65%)</div></div>
+      <div class="data-stat"><div class="data-num">8.25%</div><div class="data-desc">Kroll discount rate for catalog 18+ months old</div></div>
+      <div class="data-stat"><div class="data-num">11.75%</div><div class="data-desc">Kroll discount rate for catalog 3–18 months old</div></div>
+      <div class="data-context">Deals: Blackstone/Hipgnosis $1.47B (62.5% LTV), Concord $850M (52.3% LTV), HarbourView $500M, Kobalt $267M (65% LTV). Apollo underwrote and anchored Concord's deal — Scipio's team.</div>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">Kate Bush — The Spike</div>
+      <div class="data-stat"><div class="data-num">9,900%</div><div class="data-desc">U.S. Spotify stream increase post-Stranger Things</div></div>
+      <div class="data-stat"><div class="data-num">$2.3M</div><div class="data-desc">Estimated earnings in one month (Luminate/Fortune)</div></div>
+      <div class="data-stat"><div class="data-num">37 yrs</div><div class="data-desc">Since last Hot 100 appearance (1985 → 2022)</div></div>
+      <div class="data-context">Song released 1985. Kate Bush rarely licenses songs but approved due to being a Stranger Things fan. The TTM distortion: if this month was included in a 12-month trailing period used for valuation, NPS would be massively inflated.</div>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">ABBA — The Step Change</div>
+      <div class="data-stat"><div class="data-num">$129M</div><div class="data-desc">Voyage arena revenue in 2023</div></div>
+      <div class="data-stat"><div class="data-num">$113M</div><div class="data-desc">Voyage arena revenue in 2024 (sustained)</div></div>
+      <div class="data-stat"><div class="data-num">10th</div><div class="data-desc">ABBA Gold rank among biggest albums of 2022</div></div>
+      <div class="data-context">Voyage album released Nov 2021 — first new music since 1982. Arena opened May 2022. 3+ years of sustained elevated performance distinguishes this as a step change. Your strongest case for legitimate valuation input from an exploitation event.</div>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">Streaming Context (Luminate 2024)</div>
+      <div class="data-stat"><div class="data-num">4.8T</div><div class="data-desc">Global on-demand audio streams in 2024 (+14% YoY)</div></div>
+      <div class="data-stat"><div class="data-num">73.3%</div><div class="data-desc">Catalog music share of total album consumption</div></div>
+      <div class="data-stat"><div class="data-num">72.6%</div><div class="data-desc">Rock genre: streams from deep catalog (5+ years old)</div></div>
+      <div class="data-stat"><div class="data-num">+3.6%</div><div class="data-desc">Beach Boys catalog lift post-documentary (Luminate)</div></div>
+      <div class="data-context">Your case studies (Kate Bush 1985, Fleetwood Mac 1977, ABBA 1974–1982) are all "deep catalog" by Luminate's definition. Their baseline streaming rates are low relative to current music — which makes exploitation spikes even more dramatic in percentage terms.</div>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">2024 M&A — Notable Transactions</div>
+      <div class="data-stat"><div class="data-num">$2.2B+</div><div class="data-desc">Hipgnosis to Blackstone (45,000 songs)</div></div>
+      <div class="data-stat"><div class="data-num">$1B+</div><div class="data-desc">Queen to Sony (excl. U.S. recorded music)</div></div>
+      <div class="data-stat"><div class="data-num">$625M+</div><div class="data-desc">MJ/Sony 50% JV (recorded + publishing)</div></div>
+      <div class="data-stat"><div class="data-num">$400M+</div><div class="data-desc">Pink Floyd to Sony (recorded + image rights)</div></div>
+      <div class="data-context">Source: Shot Tower Capital 2025, pg. 54. These transactions are relevant as context for why catalog valuation accuracy matters — each of these deals involved third-party valuations that informed deal pricing and/or ABS leverage capacity.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     VOCAB
+══════════════════════════════════════════════════ -->
+<div class="section" id="vocab">
+  <h2 class="sec-title">Vocabulary & Cheat Sheet</h2>
+  <p class="sec-sub">Every term you need to own. Know these cold before any industry conversation.</p>
+
+  <div class="proposal-intro" style="border-left-color:var(--cerulean);margin-bottom:28px;">
+    <p><strong>TLDR — The 6 terms your thesis lives or dies on:</strong> <strong>TTM</strong> (trailing 12-month revenue — where the distortion enters) · <strong>NPS/NLS</strong> (the cash flow metrics multiples are applied to) · <strong>Step change vs. spike</strong> (the central question your empirical work answers) · <strong>ABS</strong> (why valuation accuracy matters beyond just sale price) · <strong>LTV</strong> (the lever that connects inflated valuation to downstream financing risk) · <strong>Normalization</strong> (the best practice gap your thesis fills). If you can explain all six to a non-expert in 60 seconds each, you're ready to write.</p>
+  </div>
+
+  <div class="vocab-list">
+    <div class="vocab-item"><div class="vocab-term">TTM / Trailing Twelve Months</div><div class="vocab-def">The last 12 months of revenue used as the base for valuation multiples. Central to your thesis — exploitation events that hit within this window directly inflate the calculated catalog value.</div></div>
+    <div class="vocab-item"><div class="vocab-term">NPS — Net Publisher's Share</div><div class="vocab-def">Net income retained by a music publisher after paying the songwriter's share. Current 2024 benchmark: 16.1x NPS (ex-iconic), 17.5x including iconic transactions. The primary cash flow metric for publishing catalog valuation.</div></div>
+    <div class="vocab-item"><div class="vocab-term">NLS — Net Label Share</div><div class="vocab-def">Net income retained by a record label after artist royalties. Current 2024 benchmark: 13.0x NLS (ex-iconic), 14.2x including iconic. Always trades at ~20% discount to NPS due to higher exploitation costs and less diversified income streams.</div></div>
+    <div class="vocab-item"><div class="vocab-term">DCF — Discounted Cash Flow</div><div class="vocab-def">Estimates present value of all future expected cash flows, discounted by WACC. Best practice per Alderbrook (2022): apply DCF alongside multiples, normalize one-off events. Requires projecting forward — doesn't assume past = future. Discount rate for stable catalog: ~8.25–9.5%.</div></div>
+    <div class="vocab-item"><div class="vocab-term">WACC — Weighted Avg. Cost of Capital</div><div class="vocab-def">Blended cost of a company's debt and equity financing. Used as DCF discount rate. ABS financing lowers WACC by ~1.13% vs. bank debt (Shot Tower p.18), allowing buyers to pay ~10% more for the same asset while maintaining target equity returns.</div></div>
+    <div class="vocab-item"><div class="vocab-term">ABS — Asset-Backed Securitization</div><div class="vocab-def">Financing structure pooling royalty-generating catalogs as collateral for notes sold to institutional investors. Rated by Kroll, Moody's. Music ABS surged 2022–2024: $3B+ raised in 2024 alone. Apollo, PIMCO, Nuveen are major investors. Typical deal size: $80M–$1.8B.</div></div>
+    <div class="vocab-item"><div class="vocab-term">LTV — Loan-to-Value Ratio</div><div class="vocab-def">Debt as % of appraised asset value. Music ABS: 52–65% LTV. Covenants require maintaining LTV below threshold. If appraised value rises from exploitation, company can upsize debt. If value later falls, covenant breach risk. This is Scipio's $100M → $150M example.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Step Change</div><div class="vocab-def">A permanent upward shift in streaming performance following an exploitation event — the new baseline is sustainably higher. Represents legitimate durable value creation. Your thesis verdict for ABBA. The key question your empirical work answers for each case study.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Spike / Reversion</div><div class="vocab-def">A temporary surge in streaming that eventually returns to pre-event baseline. Creates TTM revenue distortion if it falls within the valuation window. Should be normalized per best practice — but often isn't in multiples-based approaches.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Normalization</div><div class="vocab-def">Adjusting historical revenue to remove one-off or non-recurring items before applying multiples or building DCF projections. Alderbrook (2022) specifically recommends normalizing "unusually high sync" income. The gap between best practice (normalize) and common practice (don't) is the core problem your thesis addresses.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Exploitation Event</div><div class="vocab-def">Any event that generates renewed attention to an existing catalog: sync placement, TikTok virality, biopic, anniversary campaign, artist death, remix. Can be positive (revenue-generating) or negative (reputational). Your study covers four types with distinct durability patterns.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Kroll Bond Rating Agency (KBRA)</div><div class="vocab-def">Third-party valuation and ratings agency for music ABS. Applied 8.25% discount rate to stable catalog (Kobalt deal); 11.75% for newer songs. Their appraisals determine ABS debt capacity — making accurate TTM revenue inputs critical to appropriate leverage levels.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Iconic Premium</div><div class="vocab-def">Valuation premium for culturally significant catalogs (Dylan, Springsteen, MJ, Queen). Multiples 18–30x+ vs. 16x standard. Shot Tower (2025) notes premiums reflect perceived durability — which your thesis tests empirically: are iconic-level streaming numbers always durable?</div></div>
+    <div class="vocab-item"><div class="vocab-term">Deep Catalog</div><div class="vocab-def">Luminate definition: music streamed 5+ years after release. Kate Bush, Fleetwood Mac, and ABBA all qualify. Rock is most deep-catalog-heavy genre (72.6% of streams from deep catalog). Low baseline streaming rates make exploitation spikes dramatically large in % terms.</div></div>
+    <div class="vocab-item"><div class="vocab-term">Qualitative Comparative Case Study</div><div class="vocab-def">Your methodological approach. Analyzes multiple cases to identify patterns, not to test a hypothesis or prove causation. Appropriate when the goal is exploratory documentation rather than statistical inference. Explicitly: no econometrics, no causal claims.</div></div>
+    <div class="vocab-item"><div class="vocab-term">SOFR — Secured Overnight Financing Rate</div><div class="vocab-def">Base interest rate used in music catalog financing (replaced LIBOR). Current music ABS spreads: +185 to +250 basis points over 5-year treasury. Relevant because ABS base rate directly affects the discount rate used in Kroll appraisals supporting your case study catalog valuations.</div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
 <script>
-  // Countdown
-  function updateCountdown() {
-    const deadline = new Date('2026-04-13T23:59:00');
-    const now = new Date();
-    const diff = deadline - now;
-    if (diff <= 0) { document.getElementById('countdown').textContent = 'Due today!'; return; }
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    document.getElementById('countdown').textContent = `${days}d ${hours}h remaining`;
-    document.getElementById('days-left').textContent = days;
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 60000);
+// ── COUNTDOWN ──
+function updateCountdown(){
+  const dl=new Date('2026-04-13T23:59:00');
+  const now=new Date();
+  const diff=dl-now;
+  if(diff<=0){document.getElementById('countdown').textContent='Due today!';return;}
+  const d=Math.floor(diff/(1000*60*60*24));
+  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  document.getElementById('countdown').textContent=d+'d '+h+'h remaining';
+  document.getElementById('days-left').textContent=d;
+}
+updateCountdown();
+setInterval(updateCountdown,60000);
 
-  // Tab switching
-  function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
-  }
+// ── SECTION TABS ──
+function showSection(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(el)el.classList.add('active');
+}
 
-  // Day toggle
-  function toggleDay(id) {
-    const card = document.getElementById(id);
-    card.classList.toggle('open');
-  }
-
-  // Complete day
-  function completeDay(e, id) {
-    e.stopPropagation();
-    const card = document.getElementById(id);
-    card.classList.toggle('completed');
-    updateProgress();
-  }
-
-  // Task check
-  function checkTask(el) {
-    el.classList.toggle('checked');
-    el.textContent = el.classList.contains('checked') ? '✓' : '';
-    const textEl = el.nextElementSibling;
-    if (textEl) textEl.classList.toggle('checked-text');
-    updateProgress();
-  }
-
-  // Progress
-  function updateProgress() {
-    const total = document.querySelectorAll('.task-check').length;
-    const done = document.querySelectorAll('.task-check.checked').length;
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    document.getElementById('progress-fill').style.width = pct + '%';
-    document.getElementById('tasks-done').innerHTML = `${done}<span>/${total}</span>`;
-  }
-
-  // Reading filter
-  function filterReading(tag, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.reading-card').forEach(card => {
-      if (tag === 'all') { card.style.display = ''; return; }
-      const tags = card.getAttribute('data-tags') || '';
-      const type = card.querySelector('.reading-type')?.textContent?.toLowerCase() || '';
-      if (tag === 'listen') {
-        card.style.display = type.includes('podcast') ? '' : 'none';
-      } else {
-        card.style.display = tags.includes(tag) ? '' : 'none';
-      }
-    });
-  }
-
+// ── DAY CARDS ──
+function toggleDay(id){
+  document.getElementById(id).classList.toggle('open');
+}
+function completeDay(e,id){
+  e.stopPropagation();
+  document.getElementById(id).classList.toggle('completed');
   updateProgress();
+}
+function checkTask(el){
+  el.classList.toggle('checked');
+  el.textContent=el.classList.contains('checked')?'✓':'';
+  const t=el.nextElementSibling;
+  if(t)t.classList.toggle('done');
+  updateProgress();
+}
+function updateProgress(){
+  const total=document.querySelectorAll('.task-check').length;
+  const done=document.querySelectorAll('.task-check.checked').length;
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('tasks-done').innerHTML=done+'<sup>/'+total+'</sup>';
+}
+
+// ── SOURCE FILTER ──
+function filterSources(tag,btn){
+  document.querySelectorAll('.sfbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.src-card').forEach(card=>{
+    if(tag==='all'){card.style.display='';return;}
+    const tags=card.getAttribute('data-tags')||'';
+    card.style.display=tags.includes(tag)?'':'none';
+  });
+}
+
+// ── PROPOSAL SECTIONS ──
+function toggleProp(id){
+  const s=document.getElementById(id);
+  s.classList.toggle('open');
+}
+
+// open first proposal section by default
+document.getElementById('ps1').classList.add('open');
+
+updateProgress();
 </script>
 </body>
 </html>
